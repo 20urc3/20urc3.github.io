@@ -154,7 +154,7 @@ Vendor: GNU Project
 Product: GNU Binutils
 Version Affected: 2.43 and potentially earlier versions
 Fix Status: Fixed in commit e0323071916878e0634a6e24d8250e4faff67e88
-
+Original discovery credit: 2ourc3
 
 <subtitle style="color: #eda955;">Description:</subtitle>
 A buffer overflow vulnerability exists in GNU Binutils’ objdump utility when 
@@ -177,9 +177,5 @@ The issue has been patched by adding proper validation checks in the first_phase
 function to guard against modification of _bfd_std_section[] entries. The fix 
 specifically addresses the handling of bfd_abs_section in the tekhex parser.
 
-<subtitle style="color: #eda955;">References:</subtitle>
-- Fixed in commit: e0323071916878e0634a6e24d8250e4faff67e88
-- Sourceware PR: 32347
-- Original discovery credit: Salim LARGO (2ourc3)
 </div></center></pre></body>
 </html>
