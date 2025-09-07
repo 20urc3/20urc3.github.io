@@ -1,1 +1,55 @@
+<html>
+<head>
+<title>2ourc3</title>
+<meta charset="utf-8">
+<style>
+    body {
+      color: #FEFEFE;
+      background-color: #0c0d10;
+      margin: 0 auto;
+      padding: 1em 0 1em 0;
+    }
 
+@font-face { font-family: "gohu"; src: url("gohu.woff") format('woff'); }
+       pre { font-family: "gohu", "Lucida Console", monospace, Monaco; font-size: 14px; line-height: 1.0; }
+         a { color: #93ffd7; text-decoration: none; }
+</style>
+</head>
+<body>
+<center><div style="display: inline-block; text-align: left;"><pre>
+<blop style="color: #B30409">Buffer Overflow in GNU Binutils objdump tekhex Parser</blop>
+Vulnerability Type: Buffer Overflow
+Vendor: GNU Project
+Product: GNU Binutils
+Version Affected: 2.43 and potentially earlier versions
+Fix Status: Fixed in commit e0323071916878e0634a6e24d8250e4faff67e88
+
+Description:
+
+A buffer overflow vulnerability exists in GNU Binutils’ objdump utility when 
+processing tekhex format files. The vulnerability occurs in the Binary File 
+Descriptor (BFD) library’s tekhex parser during format identification. 
+Specifically, the issue manifests when attempting to read 8 bytes at 
+an address that precedes the global variable ‘_bfd_std_section’, 
+resulting in an out-of-bounds read.
+
+The root cause stems from improper handling of the bfd_abs_section pointer 
+in the first_phase function within tekhex.c. The code attempts to perform 
+section traversal operations on bfd_abs_section_ptr without proper validation, 
+leading to an invalid memory access. An attacker can exploit this vulnerability
+by crafting a malicious tekhex file that, when processed by objdump, 
+triggers an out-of-bounds read.
+
+Fix:
+
+The issue has been patched by adding proper validation checks in the first_phase
+function to guard against modification of _bfd_std_section[] entries. The fix 
+specifically addresses the handling of bfd_abs_section in the tekhex parser.
+
+
+References:
+
+- Fixed in commit: e0323071916878e0634a6e24d8250e4faff67e88
+- Sourceware PR: 32347
+- Original discovery credit: Salim LARGO (2ourc3)
+</pre></div></center></body></html>
