@@ -1,1 +1,1 @@
-Handcrafting bit flipping machines.
+Handcrafted bit flipping machines.
