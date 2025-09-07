@@ -15,15 +15,15 @@
 </style>
 </head>
 <body>
-<center><div style="display: inline-block; text-align: center;"><pre>
-<h1 style="color: #B30409">Buffer Overflow in GNU Binutils objdump tekhex Parser</h1>
+<center><div style="display: inline-block; text-align: left;"><pre>
+<h3 style="color: #B30409">Buffer Overflow in GNU Binutils objdump tekhex Parser</h3>
 Vulnerability Type: Buffer Overflow
 Vendor: GNU Project
 Product: GNU Binutils
 Version Affected: 2.43 and potentially earlier versions
 Fix Status: Fixed in commit e0323071916878e0634a6e24d8250e4faff67e88
 
-Description:
+<h3 style="color: #B30409">Description:</h3>
 
 A buffer overflow vulnerability exists in GNU Binutils’ objdump utility when processing tekhex format files. The vulnerability occurs in the Binary File Descriptor (BFD) library’s tekhex parser during format identification. Specifically, the issue manifests when attempting to read 8 bytes at an address that precedes the global variable ‘_bfd_std_section’, resulting in an out-of-bounds read.
 Technical Details
@@ -32,11 +32,11 @@ The root cause stems from improper handling of the bfd_abs_section pointer in th
 The code attempts to perform section traversal operations on bfd_abs_section_ptr without proper validation, leading to an invalid memory access.
 An attacker can exploit this vulnerability by crafting a malicious tekhex file that, when processed by objdump, triggers an out-of-bounds read.
 
-Fix:
+<h3 style="color: #B30409">Fix:</h3>
 The issue has been patched by adding proper validation checks in the first_phase function to guard against modification of _bfd_std_section[] entries. 
 The fix specifically addresses the handling of bfd_abs_section in the tekhex parser.
 
-References:
+<h3 style="color: #B30409">References:</h3>
 - Fixed in commit: e0323071916878e0634a6e24d8250e4faff67e88
 - Sourceware PR: 32347
 - Original discovery credit: Salim LARGO (2ourc3)
