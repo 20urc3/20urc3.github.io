@@ -157,6 +157,7 @@ Fix Status: Fixed in commit e0323071916878e0634a6e24d8250e4faff67e88
 Original discovery credit: 2ourc3
 
 <subtitle style="color: #eda955;">Description:</subtitle>
+    
 A buffer overflow vulnerability exists in GNU Binutils’ objdump utility when 
 processing tekhex format files. The vulnerability occurs in the Binary File 
 Descriptor (BFD) library’s tekhex parser during format identification. 
@@ -173,6 +174,7 @@ triggers an out-of-bounds read.
 
 
 <subtitle style="color: #eda955;">Fix:</subtitle>
+    
 The issue has been patched by adding proper validation checks in the first_phase
 function to guard against modification of _bfd_std_section[] entries. The fix 
 specifically addresses the handling of bfd_abs_section in the tekhex parser.
