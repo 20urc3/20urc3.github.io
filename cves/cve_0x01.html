@@ -147,7 +147,7 @@
 </pre></div></center></logo>
 <body>
 <center><div style="display: inline-block; text-align: left;"><pre>
-<blop style="color: #B30409">Buffer Overflow in GNU Binutils objdump tekhex Parser</blop>
+<title style="color: #B30409; text-align: center;">Buffer Overflow in GNU Binutils objdump tekhex Parser</title>
 Vulnerability Type: Buffer Overflow
 Vendor: GNU Project
 Product: GNU Binutils
@@ -155,7 +155,7 @@ Version Affected: 2.43 and potentially earlier versions
 Fix Status: Fixed in commit e0323071916878e0634a6e24d8250e4faff67e88
 
 
-Description:
+<subtitle style="color: #ff6f00;">Description:</subtitle>
 A buffer overflow vulnerability exists in GNU Binutils’ objdump utility when 
 processing tekhex format files. The vulnerability occurs in the Binary File 
 Descriptor (BFD) library’s tekhex parser during format identification. 
@@ -170,13 +170,18 @@ leading to an invalid memory access. An attacker can exploit this vulnerability
 by crafting a malicious tekhex file that, when processed by objdump, 
 triggers an out-of-bounds read.
 
+<pre>
+    int main() {
+        printf('webi");
+    }
+</pre>
 
-Fix:
+<subtitle style="color: #ff6f00;">Fix:</subtitle>
 The issue has been patched by adding proper validation checks in the first_phase
 function to guard against modification of _bfd_std_section[] entries. The fix 
 specifically addresses the handling of bfd_abs_section in the tekhex parser.
 
-References:
+<subtitle style="color: #ff6f00;">References:</subtitle>
 - Fixed in commit: e0323071916878e0634a6e24d8250e4faff67e88
 - Sourceware PR: 32347
 - Original discovery credit: Salim LARGO (2ourc3)
