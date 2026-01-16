@@ -28,14 +28,6 @@
 &lt;p&gt;Most targets are not fuzzable out of the box and require you, the researcher, to do some heavy lifting to enable efficient fuzzing. In this article, we will explore how to fuzz a library, from the basics to persistent mode. Our focus will be on Freetype, a widely used software library for accessing font file contents.&lt;/p&gt;</description>
     </item>
     <item>
-      <title>WinAFL - Fuzzing Windows binaries</title>
-      <link>http://localhost:1313/posts/win_fuzz/</link>
-      <pubDate>Thu, 15 Jan 2026 13:45:02 +0100</pubDate>
-      <guid>http://localhost:1313/posts/win_fuzz/</guid>
-      <description>&lt;h3 id=&#34;introduction&#34;&gt;&lt;strong&gt;Introduction&lt;/strong&gt;&lt;/h3&gt;
-&lt;p&gt;Today we are gonna dive into &lt;strong&gt;grey-box fuzzing&lt;/strong&gt; by testing closed source Windows binaries. This type of fuzzing allows one to fuzz a target without having access to its source code. Why doing such type of fuzzing? Since it requires more setup and advanced skills, less people are prone to look for vulnerabilities / being able to find them. Thus it enlarge the possibilities for you, vulnerability researcher, to find new undiscovered vulns.&lt;/p&gt;</description>
-    </item>
-    <item>
       <title>Golem - Engineering AI for Static Security Analysis</title>
       <link>http://localhost:1313/posts/golem/</link>
       <pubDate>Thu, 15 Jan 2026 00:00:00 +0000</pubDate>
@@ -44,6 +36,14 @@
 &lt;p&gt;Have you ever tried to build furniture and somehow you got more (or less) parts than what you&amp;rsquo;d expect. You end up with a tiny stick of wood and 3 screws and your furniture seems to be done ? Reading the documentation is for the weak so you pull up your phone and ask ChatGPT: How many of those things I should have ?&lt;/p&gt;
 &lt;p&gt;&lt;img alt=&#34;image&#34; loading=&#34;lazy&#34; src=&#34;http://localhost:1313/posts/golem/image1.png&#34;&gt;&lt;/p&gt;
 &lt;p&gt;You check by yourself and what on Earth is ChatGPT yapping about ? There is now way there are that many parts left in the bag and 5 are already in the wardrobe. But wait, since a while now GPT (and others) accept document input. So, smart as you are, you download the instruction and immediately send it !&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>WinAFL - Fuzzing Windows binaries</title>
+      <link>http://localhost:1313/posts/win_fuzz/</link>
+      <pubDate>Thu, 15 Jan 2026 13:45:02 +0100</pubDate>
+      <guid>http://localhost:1313/posts/win_fuzz/</guid>
+      <description>&lt;h3 id=&#34;introduction&#34;&gt;&lt;strong&gt;Introduction&lt;/strong&gt;&lt;/h3&gt;
+&lt;p&gt;Today we are gonna dive into &lt;strong&gt;grey-box fuzzing&lt;/strong&gt; by testing closed source Windows binaries. This type of fuzzing allows one to fuzz a target without having access to its source code. Why doing such type of fuzzing? Since it requires more setup and advanced skills, less people are prone to look for vulnerabilities / being able to find them. Thus it enlarge the possibilities for you, vulnerability researcher, to find new undiscovered vulns.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
