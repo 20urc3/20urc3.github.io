@@ -37,24 +37,24 @@ While each method offer their own pros and cons, we will focus today on using Dy
 ```bash
 $ mkdir build32  
 $ cd build32  
-$ cmake \-G"Visual Studio 16 2019" \-A Win32 .. \-DDynamoRIO\_DIR\=..\\path\\to\\DynamoRIO\\cmake \-DINTELPT\=1  
-$ cmake \--build . \--config Release
+$ cmake -G"Visual Studio 16 2019" -A Win32 .. -DDynamoRIO_DIR=..pathtoDynamoRIOcmake -DINTELPT=1  
+$ cmake --build . --config Release
 ```
 **For a 64-bit build:**
 ```bash
 $ mkdir build64  
 $ cd build64  
-$ cmake \-G"Visual Studio 16 2019" \-A x64 .. \-DDynamoRIO\_DIR\=..\\path\\to\\DynamoRIO\\cmake \-DINTELPT\=1  
-$ cmake \--build . \--config Release
+$ cmake -G"Visual Studio 16 2019" -A x64 .. -DDynamoRIO_DIR=..pathtoDynamoRIOcmake -DINTELPT=1  
+$ cmake --build . --config Release
 ```
 
 ### Build configuration options
 The following cmake configuration options are supported:
 
-* **`-DDynamoRIO_DIR=..\path\to\DynamoRIO\cmake`** \- Needed to build the winafl.dll DynamoRIO client  
-* **`-DINTELPT=1`** \- Enable Intel PT mode. For more information see [https://github.com/googleprojectzero/winafl/blob/master/readme\_pt.md](https://github.com/googleprojectzero/winafl/blob/master/readme_pt.md)  
-* **`-DUSE_COLOR=1`** \- color support (Windows 10 Anniversary edition or higher)  
-* **`-DUSE_DRSYMS=1`** \- Drsyms support (use symbols when available to obtain \-target\_offset from \-target\_method). Enabling this has been known to cause issues on Windows 10 v1809, though there are workarounds, see [\#145](https://github.com/googleprojectzero/winafl/issues/145)
+* **`-DDynamoRIO_DIR=..pathtoDynamoRIOcmake`** - Needed to build the winafl.dll DynamoRIO client  
+* **`-DINTELPT=1`** - Enable Intel PT mode. For more information see [https://github.com/googleprojectzero/winafl/blob/master/readme_pt.md](https://github.com/googleprojectzero/winafl/blob/master/readme_pt.md)  
+* **`-DUSE_COLOR=1`** - color support (Windows 10 Anniversary edition or higher)  
+* **`-DUSE_DRSYMS=1`** - Drsyms support (use symbols when available to obtain -target_offset from -target_method). Enabling this has been known to cause issues on Windows 10 v1809, though there are workarounds, see [#145](https://github.com/googleprojectzero/winafl/issues/145)
 
 ### **Find a target**
 
@@ -106,7 +106,7 @@ Let's replace the instruction `CALL FUN_00401000` by a NOP instruction
 
 ![](image8.png)
 
-As you can see, there is now a bunch of "??" following our instruction. It's because the initial instruction was larger than the NOP instruction (in hex: 90\) so we need to replace the "??" by NOP instructions too to respect the padding. More info [https://en.wikipedia.org/wiki/Data\_structure\_alignment](https://en.wikipedia.org/wiki/Data_structure_alignment)
+As you can see, there is now a bunch of "??" following our instruction. It's because the initial instruction was larger than the NOP instruction (in hex: 90) so we need to replace the "??" by NOP instructions too to respect the padding. More info [https://en.wikipedia.org/wiki/Data_structure_alignment](https://en.wikipedia.org/wiki/Data_structure_alignment)
 
 The result must look like this:
 
@@ -120,7 +120,7 @@ Let's run the program and see if the dialog box happens again:
 
 ![](image11.png)
 
-Bravo\! Keep in mind that most programs have way more complex interactions required, and this course isn't about Reverse Engineering. However a big aspect of running successful fuzzing campaign consist in removing what makes the fuzzer slower, and GUI is a big part of that. You should definitely have some interest in RE if you want to pursue research in fuzzing.
+Bravo! Keep in mind that most programs have way more complex interactions required, and this course isn't about Reverse Engineering. However a big aspect of running successful fuzzing campaign consist in removing what makes the fuzzer slower, and GUI is a big part of that. You should definitely have some interest in RE if you want to pursue research in fuzzing.
 
 ### **Function offset**
 
@@ -166,32 +166,32 @@ Let's double click the first occurrence in the Namespace `FUN_00401060`
 Remember that the execution flow we are looking for is: Open file > Read it > Close the File > return to normal execution. Let's investigate if this flow happens in the pseudo code of the function. Simplified it give us:
 
 ```c
-void \_\_cdecl FUN\_00401060(int argc, int argv)  
+void __cdecl FUN_00401060(int argc, int argv)  
  {  
    uint openResult;  
    uint readResult;  
-   WCHAR fileContentBuffer\[6\]; // Buffer to store file content  
+   WCHAR fileContentBuffer[6]; // Buffer to store file content  
    uint localVariable;  
    
-   localVariable \= DAT\_0041c040 ^ (uint)&stack0xfffffffc;  
+   localVariable = DAT_0041c040 ^ (uint)&stack0xfffffffc;  
    
-   if (argc \< 2) {  
-     FUN\_00401130((int)s\_Usage:\_%s\_\<filename\>\_0041c000); // Print usage message  
+   if (argc < 2) {  
+     FUN_00401130((int)s_Usage:_%s_<filename>_0041c000); // Print usage message  
    }  
    else {  
-     openResult \= FID\_conflict:\_\_open(\*(char \*\*)(argv \+ 4), 0x8000); // Open file specified in argv\[1\]  
+     openResult = FID_conflict:__open(*(char **)(argv + 4), 0x8000); // Open file specified in argv[1]  
      
-     if ((int)openResult \< 0) {  
-       FUN\_00401130((int)s\_Failed\_to\_open\_file:\_%s\_0041c018); // Print error message if file opening fails  
+     if ((int)openResult < 0) {  
+       FUN_00401130((int)s_Failed_to_open_file:_%s_0041c018); // Print error message if file opening fails  
      }  
      else {  
-       while (readResult \= FUN\_00406348(openResult, fileContentBuffer, 10), 0 \< (int)readResult) {  
-         FUN\_00401130((int)&DAT\_0041c034); // Print file contents  
+       while (readResult = FUN_00406348(openResult, fileContentBuffer, 10), 0 < (int)readResult) {  
+         FUN_00401130((int)&DAT_0041c034); // Print file contents  
        }  
-       FUN\_00407b70(openResult); // Close the file  
+       FUN_00407b70(openResult); // Close the file  
      }  
    }  
-   FUN\_0040116a(localVariable ^ (uint)&stack0xfffffffc); // Some additional function call  
+   FUN_0040116a(localVariable ^ (uint)&stack0xfffffffc); // Some additional function call  
    return;  
   }
 ```
@@ -213,30 +213,30 @@ Having a nice corpus of inputs is a very important aspect of fuzzing. WinAFL off
 
 * **Typical use**  
 ```powershell
-  winafl-cmin.py \-D D:\\DRIO\\bin32 \-t 100000 \-i in \-o minset \-covtype edge \-coverage\_module m.dll \-target\_module test.exe \-target\_method fuzz \-nargs 2 \-- test.exe @@  
+  winafl-cmin.py -D D:DRIObin32 -t 100000 -i in -o minset -covtype edge -coverage_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@  
 ```
 * **Dry-run, keep crashes only with 4 workers with a working directory:**  
 ```powershell
-  winafl-cmin.py \-C \--dry-run \-w 4 \--working-dir D:\\dir \-D D:\\DRIO\\bin32 \-t 10000 \-i in \-i C:\\fuzz\\in \-o out\_mini \-covtype edge \-coverage\_module m.dll \-target\_module test.exe \-target\_method fuzz \-nargs 2 \-- test.exe @@ 
+  winafl-cmin.py -C --dry-run -w 4 --working-dir D:dir -D D:DRIObin32 -t 10000 -i in -i C:fuzzin -o out_mini -covtype edge -coverage_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@ 
 ```
 * **Read from specific file**  
 ```powershell
-  winafl-cmin.py \-D D:\\DRIO\\bin32 \-t 100000 \-i in \-o minset \-f foo.ext \-covtype edge \-coverage\_module m.dll \-target\_module test.exe \-target\_method fuzz \-nargs 2 \-- test.exe @@ 
+  winafl-cmin.py -D D:DRIObin32 -t 100000 -i in -o minset -f foo.ext -covtype edge -coverage_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@ 
 ```
 * **Read from specific file with pattern**  
 ```powershell
-  winafl-cmin.py \-D D:\\DRIO\\bin32 \-t 100000 \-i in \-o minset \-f prefix-@@-foo.ext \-covtype edge \-coverage\_module m.dll \-target\_module test.exe \-target\_method fuzz \-nargs 2 \-- test.exe @@ 
+  winafl-cmin.py -D D:DRIObin32 -t 100000 -i in -o minset -f prefix-@@-foo.ext -covtype edge -coverage_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@ 
 ```
 * **Typical use with static instrumentation**  
 ```powershell
-  winafl-cmin.py \-Y \-t 100000 \-i in \-o minset \-- test.exe @@
+  winafl-cmin.py -Y -t 100000 -i in -o minset -- test.exe @@
 ```
 
 `winafl-cmin.py` can take a while to run, so be patient.
 
 ### **Running a campaign**
 
-We have patched the binary to make it fuzzable, found the offset of the function we want to test, now let's have fun and run the fuzzer\! WinAFL offers different options, let's enumerate them:
+We have patched the binary to make it fuzzable, found the offset of the function we want to test, now let's have fun and run the fuzzer! WinAFL offers different options, let's enumerate them:
 
 * **`t`** – Timeout per fuzzing iteration. If not completed WinAFL restart the program;  
 * **`D`** – DynamoRIO path  
@@ -247,13 +247,13 @@ We have patched the binary to make it fuzzable, found the offset of the function
 * **`call_convention`** – Specifying the calling convetion: **`sdtcall`**, **`cdecl`**, and **`thiscall`**.  
 * **`nargs`** – number of arguments the fuzzed function takes. The `this` pointer (used in the **`thiscall`** calling convention) is also considered an argument.
 
-**WARNING**: We build 2 WinAFL right? Remember, use the correct version of AFL for the target you are looking to fuzz\! Here we are going to use the 32 bits version\!
+**WARNING**: We build 2 WinAFL right? Remember, use the correct version of AFL for the target you are looking to fuzz! Here we are going to use the 32 bits version!
 
 Since our binary is meant to open and read from a text file, create a "in" folder and put a text file with a simple phrase as content.
 
-Ok now let's cd into WinAFL\_32 build directory and run the following command:
+Ok now let's cd into WinAFL_32 build directory and run the following command:
 ```powershell
-afl-fuzz.exe \-i in \-o out \-t 10000 \-D C:\\WinAFL\\DynamoRIO\\bin32 \-- \-fuzz\_iterations 500 \-coverage\_module vulnerable\_reader.exe \-target\_module vulnerable\_reader.exe \-target\_offset 0x01060 \-nargs 3 \-call\_convention thiscall \-- vulnerable\_reader.exe @@
+afl-fuzz.exe -i in -o out -t 10000 -D C:WinAFLDynamoRIObin32 -- -fuzz_iterations 500 -coverage_module vulnerable_reader.exe -target_module vulnerable_reader.exe -target_offset 0x01060 -nargs 3 -call_convention thiscall -- vulnerable_reader.exe @@
 ```
 
 If everything went well, you should see this beauty appears:
@@ -266,7 +266,7 @@ Now it's a matter of time. Let the fuzzer run a few minutes then you should see 
 
 ### **Analyze crash test**
 
-Here **WinAFL** found a crash really quickly. I designed on purpose a binary very simple to crash in order for this tutorial to be fun to do. As you can see, WinAFL names the crash file with the status and type of crash. You can find them in your out directory \> crashes
+Here **WinAFL** found a crash really quickly. I designed on purpose a binary very simple to crash in order for this tutorial to be fun to do. As you can see, WinAFL names the crash file with the status and type of crash. You can find them in your out directory > crashes
 
 ![](image18.png)
 
@@ -280,12 +280,12 @@ As you can see WinDBG is immediately screaming that a stack buffer overrun is de
 
 ### **References**
 
-* **WinAFL** \- [https://github.com/googleprojectzero/winafl](https://github.com/googleprojectzero/winafl)  
-* **DynamoRIO** \- [https://dynamorio.org/](https://dynamorio.org/)  
-* **Syzygy** \- [https://github.com/google/syzygy/wiki](https://github.com/google/syzygy/wiki)  
-* **Intel PTrace** \- [https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/](https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/)  
-* **ProcMon** \- [learn.microsoft.com/en-us/sysinternals/downloads/procmon](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon)  
-* **x64dbg** \- [x64dbg.com/\#start](https://x64dbg.com/#start)  
-* **WinDBG** \- [https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools)  
-* **Ghidra CheatSheet** \- [https://ghidra-sre.org/CheatSheet.html](https://ghidra-sre.org/CheatSheet.html)  
-* **Windows Internals** \- [scorpiosoftware.net/category/windows-internals/](https://scorpiosoftware.net/category/windows-internals/)  
+* **WinAFL** - [https://github.com/googleprojectzero/winafl](https://github.com/googleprojectzero/winafl)  
+* **DynamoRIO** - [https://dynamorio.org/](https://dynamorio.org/)  
+* **Syzygy** - [https://github.com/google/syzygy/wiki](https://github.com/google/syzygy/wiki)  
+* **Intel PTrace** - [https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/](https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/)  
+* **ProcMon** - [learn.microsoft.com/en-us/sysinternals/downloads/procmon](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon)  
+* **x64dbg** - [x64dbg.com/#start](https://x64dbg.com/#start)  
+* **WinDBG** - [https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools)  
+* **Ghidra CheatSheet** - [https://ghidra-sre.org/CheatSheet.html](https://ghidra-sre.org/CheatSheet.html)  
+* **Windows Internals** - [scorpiosoftware.net/category/windows-internals/](https://scorpiosoftware.net/category/windows-internals/)  

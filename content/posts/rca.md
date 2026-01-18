@@ -158,7 +158,7 @@ Check a few relevant values:
 
 ```bash
 pwndbg> print buf
-$2 = (const uint8_t *) 0x522000000100 "\377\330\377", <incomplete sequence \340>
+$2 = (const uint8_t *) 0x522000000100 "377330377", <incomplete sequence 340>
 pwndbg> print frame
 $3 = (AVFrame *) 0x515000002ac0
 pwndbg> print &s->exif_metadata
