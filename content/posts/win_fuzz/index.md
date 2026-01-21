@@ -5,27 +5,77 @@ draft: false
 weight: 4
 ---
 
-### **Introduction**
+## Introduction
 
-Today we are gonna dive into **grey-box fuzzing** by testing closed source Windows binaries. This type of fuzzing allows one to fuzz a target without having access to its source code. Why doing such type of fuzzing? Since it requires more setup and advanced skills, less people are prone to look for vulnerabilities / being able to find them. Thus it enlarge the possibilities for you, vulnerability researcher, to find new undiscovered vulns.
+In this chapter we’ll dive into **grey-box fuzzing** on **closed-source Windows binaries** (PE executables) using **WinAFL**.
 
-To achieve this we will need to overcome several challenges:
+The appeal is simple: Windows grey-box fuzzing has more friction (tooling, reversing, patching, debugging), so fewer people do it seriously — which means the targets are often less explored and the odds of finding interesting bugs can be higher.
 
-* Instrumenting the code.  
-* Find a relevant function to fuzz.  
-* Modifying/patching the binary to make it fuzzable.
+By the end of this tutorial you will be able to:
 
-There is plenty of solutions available to run fuzzing campaign on Windows binaries, however we gonna solely focus on **WinAFL** in this chapter. **WinAFL** offers three type of instrumentation:
+- run WinAFL with DynamoRIO on a Windows PE target,
+- patch “GUI blockers” that prevent automation,
+- compute a correct `target_offset`,
+- launch a fuzzing campaign and triage a crash.
 
-* Dynamic instrumentation via [**DynamoRIO**](https://dynamorio.org/) - Dynamic instrumentation is modifying the instruction of a program while the program is running.  
-* Static instrumentation via [**Syzygy**](https://github.com/google/syzygy/wiki) - Static instrumentation is modifying the instruction of a program at compilation time.  
-* Hardware Tracing via Intel [**PTrace**](https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/) - Hardware feature that asynchronously records program control flow.
+### What you’ll need to overcome
 
-While each method offer their own pros and cons, we will focus today on using Dynamic Instrumentation via **DynamoRIO**. See below a description of the workflow **WinAFL** + **DynamoRIO** will execute while fuzzing your target binary.
+To fuzz a closed-source Windows binary effectively, you usually must:
+
+- **Instrument execution** (to get coverage feedback),
+- **Pick a good target function** (one that parses your input),
+- **Patch or adapt the binary** (remove slow/interactive behavior like GUI prompts).
+
+There are multiple fuzzing solutions for Windows, but we’ll focus on **WinAFL**.
+
+WinAFL supports three instrumentation modes:
+
+- **Dynamic instrumentation via DynamoRIO** — instruments the program while it runs.
+- **Static instrumentation via Syzygy** — instruments at build/rewriting time.
+- **Hardware tracing via Intel Processor Trace (Intel PT)** — records control flow using CPU tracing.
+
+In this chapter we’ll use **dynamic instrumentation with DynamoRIO**, because it’s the easiest to apply to closed-source binaries without rebuilding them.
+
+Here is the high-level workflow of **WinAFL + DynamoRIO** during fuzzing:
 
 ![](image1.png)
 
-### **Compiling WinAFL**
+---
+
+## Glossary (quick)
+
+- **VA** (Virtual Address): the address you see in disassembly (ex: `0x00401060`).
+- **Image base**: the preferred load base of the PE module (ex: `0x00400000`).
+- **RVA / offset**: relative address from module base (`VA - ImageBase`).
+- **XREF**: cross-reference (a place where something is referenced/called).
+- **target_offset**: the function offset WinAFL hooks, relative to module base.
+
+---
+
+## Before you start (recommended lab setup)
+
+Fuzzing is chaotic by design. Keep it safe and stable:
+
+- Use a **Windows VM** (Snapshot it before starting).
+- Put the target binary, corpus, and output directory on a **fast disk** (SSD).
+- Prefer a dedicated folder like:
+  - `C:\fuzz\winafl\`
+  - `C:\fuzz\target\`
+  - `C:\fuzz\cases\`
+  - `C:\fuzz\out\`
+
+### Security note (AV / Defender)
+
+Fuzzing generates many weird files quickly and can slow down dramatically if your AV scans everything.
+
+**Safe approach:**
+- keep the VM isolated,
+- add **exclusions only** for the fuzzing folders (`in`, `out`, temp working dir),
+- avoid disabling protections globally unless you truly understand the impact.
+
+---
+
+## Compiling WinAFL
 
 1. If you are building with DynamoRIO support, download and build DynamoRIO sources or download DynamoRIO Windows binary package from [https://github.com/DynamoRIO/dynamorio/releases](https://github.com/DynamoRIO/dynamorio/releases)  
 2. If you are building with Intel PT support, pull third party dependencies by running **`git submodule update --init --recursiv`**`e` from the WinAFL source directory  
@@ -39,8 +89,10 @@ $ mkdir build32
 $ cd build32  
 $ cmake -G"Visual Studio 16 2019" -A Win32 .. -DDynamoRIO_DIR=..pathtoDynamoRIOcmake -DINTELPT=1  
 $ cmake --build . --config Release
-```
+````
+
 **For a 64-bit build:**
+
 ```bash
 $ mkdir build64  
 $ cd build64  
@@ -49,121 +101,187 @@ $ cmake --build . --config Release
 ```
 
 ### Build configuration options
+
 The following cmake configuration options are supported:
 
-* **`-DDynamoRIO_DIR=..pathtoDynamoRIOcmake`** - Needed to build the winafl.dll DynamoRIO client  
-* **`-DINTELPT=1`** - Enable Intel PT mode. For more information see [https://github.com/googleprojectzero/winafl/blob/master/readme_pt.md](https://github.com/googleprojectzero/winafl/blob/master/readme_pt.md)  
-* **`-DUSE_COLOR=1`** - color support (Windows 10 Anniversary edition or higher)  
-* **`-DUSE_DRSYMS=1`** - Drsyms support (use symbols when available to obtain -target_offset from -target_method). Enabling this has been known to cause issues on Windows 10 v1809, though there are workarounds, see [#145](https://github.com/googleprojectzero/winafl/issues/145)
+* **`-DDynamoRIO_DIR=..pathtoDynamoRIOcmake`** — Needed to build the winafl.dll DynamoRIO client
+* **`-DINTELPT=1`** — Enable Intel PT mode. For more information see [https://github.com/googleprojectzero/winafl/blob/master/readme_pt.md](https://github.com/googleprojectzero/winafl/blob/master/readme_pt.md)
+* **`-DUSE_COLOR=1`** — color support (Windows 10 Anniversary edition or higher)
+* **`-DUSE_DRSYMS=1`** — Drsyms support (use symbols when available to obtain -target_offset from -target_method). Enabling this has been known to cause issues on Windows 10 v1809, though there are workarounds, see [#145](https://github.com/googleprojectzero/winafl/issues/145)
 
-### **Find a target**
+---
 
-Finding the right target to fuzz isn't always easy. It's all about finding a software complex enough to be worthy being tested but accessible enough for you to understand what to fuzz and which features is interesting.
+## Find a target
 
-One good strategy is to target software that are known to contains vulnerability and are reactive in a disclosure program, a good way to find such is to look on the website of [Zero Day Initiative](https://www.zerodayinitiative.com/).
+Finding the right target to fuzz is part art, part practicality.
+
+A good fuzzing target is often:
+
+* complex enough to have bugs (parsers, file formats, protocols),
+* reachable and deterministic enough to fuzz efficiently,
+* and ideally not already fuzzed to death.
+
+One strategy is to look at vendors that have a history of published vulnerabilities and strong disclosure programs. A good starting point is the [Zero Day Initiative](https://www.zerodayinitiative.com/).
 
 ![](image2.png)
 
-In this section there is previously disclosed bug which can give you a good broad view of what programs are tested and their responsiveness. Here we see that vulnerability were disclosed for **Netgear** and **D-link** product, there is tons of previously disclosed vulnerabilities on this website, up to you to search through it and find the target that interest you the most.
+You’ll find previously disclosed bugs, which gives you an idea of products that are being attacked and fixed in the real world.
 
-Since fuzzing a complex target required some advanced skills such as Reverse Engineering, understand large code-base etc, we will focus on a Binary Target i specially created for the purpose of this course. It is a vulnerable file reader, it takes a file as entry, copy its content in a buffer, and close the file.
+For this tutorial, we’ll use a purpose-built target: a vulnerable file reader created specifically to make this chapter fun and hands-on. It takes a file as input, copies its content into a buffer, and closes the file.
 
-You can download the file here, password: "bushido" [https://drive.google.com/file/d/1c-cOuzYbC-gOFW91a2EHKNpZTiPrVdBP/view?usp=sharing](https://drive.google.com/file/d/1c-cOuzYbC-gOFW91a2EHKNpZTiPrVdBP/view?usp=sharing)
+Download: password **"bushido"**
+[https://drive.google.com/file/d/1c-cOuzYbC-gOFW91a2EHKNpZTiPrVdBP/view?usp=sharing](https://drive.google.com/file/d/1c-cOuzYbC-gOFW91a2EHKNpZTiPrVdBP/view?usp=sharing)
 
-### **Patching binary to allow fuzzing**
+---
 
-Unfortunately numerous software uses some kind of dialog box control flow where user is prompted to answer question before executing a certain task like "This file already exist. Do you want to overwrite it ?" etc.
+## Patching binary to allow fuzzing
+
+A lot of Windows applications rely on interactive flows:
+
+* confirmation dialogs,
+* popups,
+* UI prompts,
+* “Press OK to continue” blockers.
 
 ![](image3.png)
 
-This make the fuzzing process impossible since it will require the user to interact with dialog box, which will prevent the fuzzer to run normally. This is why we are now looking on how to improve/patch a binary in order to make it fuzzable!
+This makes fuzzing impossible because the fuzzer cannot click buttons.
 
-Download and install **Ghidra**, start the application then create a project directory and project. Import vulnerable_reader.exe click on "Options.." and enable "Load Local Libraries From Disk"
+So let’s patch the target binary to remove the dialog and make it fuzzable.
+
+### Open the binary in Ghidra
+
+Download and install **Ghidra**, create a project, and import `vulnerable_reader.exe`.
+
+Click **Options..** and enable **Load Local Libraries From Disk**.
 
 ![](image4.png)
 
-After loading the libraries you can start the process of reversing by pressing enter or double click the file name, it will prompt a dialog box `Analyze` which you can configure.
-
-For this exercise, no need to change it, however, I invite you to explore the options available and their capacities. After clicking OK you'll see the disassembly code of the binary display, you'll need to wait a bit that Ghidra analyzes the entire binary, you can find the progress bar at the bottom-right of the screen:
+Double click the binary in the project, accept the analysis dialog.
 
 ![](image5.png)
 
-If you save your program after the analysis, you wont need to analyze it again in the future. This binary is quite small, but keep in mind it wont always been the case. I encourage you to save the analyzed program as a copy just after the analysis is performed.
+Tip: save the analyzed project once analysis is finished. For real-world binaries, analysis time can become significant.
 
-Now that analysis is performed we can see through the software. Investigate this binary is gonna be quite easy since we already know one string used in the dialog box, let's open `Search > Program text` then enter `You clicked Yes!`. In `fields` enable `all fields` and in block enable `all blocks` then click `Search All` and double click on the first finding in the results.
+---
+
+## Locate and remove the GUI blocker
+
+We already know one dialog string: **"You clicked Yes!"**.
+
+Go to: `Search > Program text` and enter `You clicked Yes!`.
+Enable **all fields** and **all blocks**, then click **Search All** and double click the first result.
 
 ![](image6.png)
 
-We can see there is two options possible, either the function allows you to select yes and close or no and close. There is no real purpose this function, however, it prevent the program to continue its flow before you click and consequently prevent you to fuzz it.
+You’ll find that the dialog code blocks execution until the user clicks something.
 
-One interesting information to look at are the `XREFS`, which correspond at the emplacement where this function `FUN_00401000` is called. Here we can see that the function is called by `FUN_00401130`, let's double click and see what this function is.
+Now look at the **XREFs** (cross-references): these show where `FUN_00401000` is called.
 
 ![](image7.png)
 
-It seems that this function is basically our main function. It takes two parameters as arguments and pass it to the second function. The first function is the one responsible for the dialog box.
+Here the call originates from `FUN_00401130`, which looks like the main execution flow.
 
-Let's replace the instruction `CALL FUN_00401000` by a NOP instruction
+### Patch the CALL into NOPs
+
+Replace:
+
+* `CALL FUN_00401000`
+
+with:
+
+* a sequence of `NOP` instructions.
 
 ![](image8.png)
 
-As you can see, there is now a bunch of "??" following our instruction. It's because the initial instruction was larger than the NOP instruction (in hex: 90) so we need to replace the "??" by NOP instructions too to respect the padding. More info [https://en.wikipedia.org/wiki/Data_structure_alignment](https://en.wikipedia.org/wiki/Data_structure_alignment)
+After patching, you’ll see `??` bytes.
 
-The result must look like this:
+This is not about “alignment” — it’s about **instruction size**:
+
+* the original `CALL` instruction uses multiple bytes,
+* a `NOP` is typically one byte (`0x90`),
+* so you must pad the remaining bytes with NOPs to keep instruction boundaries valid.
+
+The final output should look like this:
 
 ![](image9.png)
 
-Now export the program as PE file, click `File > Export Program` then select `Original File` and put the right path :
+### Export the patched binary
+
+Export as PE:
+
+`File > Export Program`, select `Original File`, and choose the destination path.
 
 ![](image10.png)
 
-Let's run the program and see if the dialog box happens again:
+Now run the binary again: the dialog should be gone.
 
 ![](image11.png)
 
-Bravo! Keep in mind that most programs have way more complex interactions required, and this course isn't about Reverse Engineering. However a big aspect of running successful fuzzing campaign consist in removing what makes the fuzzer slower, and GUI is a big part of that. You should definitely have some interest in RE if you want to pursue research in fuzzing.
+Nice. This is a simple case, but the core lesson generalizes well:
 
-### **Function offset**
+**GUI == fuzzing poison.**
+If you’re serious about Windows fuzzing, basic reversing is unavoidable.
 
-WinAFL uses a technique to optimize the fuzzing process by mitigating the slow execution time associated with the exec **syscall** and the typical process startup procedure. Instead of re-initializing the target program for every fuzzing attempt, it employs a strategy inspired by the concept of a fork server.
+---
 
-The basic idea is to execute the program until reaching the desired fuzzing point by supplying randomized inputs. By employing this approach, each **subprocess** handles only a single input, effectively circumventing the overhead associated with the exact **syscall** operation.
+## Function offset and why WinAFL needs it
 
-As a result, when fuzzing a program with **WinAFL**, if the desired fuzzing point is reached during the third call, for example, the performance remains unaffected. However, the significant advantage lies in reducing the overhead of fuzzing throughout the entire program, leading to more efficient and effective fuzzing sessions.
+WinAFL is built to fuzz inner parsing logic efficiently instead of restarting the entire program from scratch for every test case.
 
-Here is a diagram that illustrate this process.
+The key idea is: run the target until a specific function, then execute that function repeatedly with new inputs in a tight loop (so you avoid a lot of expensive setup work each iteration).
+
+A simplified diagram:
 
 ![](image12.png)
 
-**How to select a target function**
+### How to select a target function
 
-The target function should do these things during its lifetime:
+Your target function should ideally:
 
-1. Open the input file. This needs to happen within the target function so that you can read a new input file for each iteration as the input file is rewritten between target function runs.  
-2. Parse it (so that you can measure coverage of file parsing)  
-3. Close the input file. This is important because if the input file is not closed **WinAFL** won't be able to rewrite it.  
-4. Return normally (So that WinAFL can "catch" this return and redirect execution. "returning" via ExitProcess() and such won't work)
+1. **Open the input file** (inside the target function)
+2. **Parse it** (so coverage reflects parsing behavior)
+3. **Close the input file** (otherwise WinAFL can’t rewrite it between iterations)
+4. **Return normally** (WinAFL relies on “clean returns” — if the function exits the process, persistent fuzzing breaks)
 
-**How to find the virtual offset of the function**
+---
 
-* Static analysis with tools like [**Ghidra**](https://github.com/NationalSecurityAgency/ghidra) and [**radare2**](https://rada.re/r/)  
-* Debugging the code with [**WinDBG**](https://docs.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools) or [**x64dbg**](https://x64dbg.com/#start) (Setting up breakpoints and analyzing the parameters of functions at runtime)  
-* Use auxiliary tools like API monitors, process monitors, and coverage tools like [**ProcMon**](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon)
+## How to find the offset of the function
 
-**Find offset via Static Analysis with Ghidra**
+Options include:
 
-The binary contains some strings, one of them is "Failed to open file", let's click the **Search** menu then click "**Program Text**" and look for this sentence:
+* Static analysis with [Ghidra](https://github.com/NationalSecurityAgency/ghidra) or [radare2](https://rada.re/)
+* Debugging with [WinDBG](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools) or [x64dbg](https://x64dbg.com/#start)
+* Instrumentation/monitoring tools like [ProcMon](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon)
+
+We’ll do it with **Ghidra** (fast and clean).
+
+---
+
+## Find offset via static analysis with Ghidra
+
+The binary contains error messages like **"Failed to open file"**.
+
+Go to `Search > Program Text` and search that string:
 
 ![](image13.png)
 
-Let's click search all and examine the result:
+Click **Search All** and inspect results:
 
 ![](image14.png)
 
-Let's double click the first occurrence in the Namespace `FUN_00401060`
+Double click the first occurrence inside `FUN_00401060`:
 
 ![](image15.png)
 
-Remember that the execution flow we are looking for is: Open file > Read it > Close the File > return to normal execution. Let's investigate if this flow happens in the pseudo code of the function. Simplified it give us:
+Now verify that the function matches our expected fuzzing flow:
+
+* opens file,
+* reads/parses,
+* closes,
+* returns normally.
+
+The decompiled pseudo-code matches that pattern (simplified):
 
 ```c
 void __cdecl FUN_00401060(int argc, int argv)  
@@ -196,96 +314,223 @@ void __cdecl FUN_00401060(int argc, int argv)
   }
 ```
 
-Sound like a match ! Now let's find the offset of this function. It's pretty straight forward, let's right-click on the function and show byte. We see the address of the function is `0x00401060` and the base address is `0x0040000` so the function offset is `0x01060`
+### Compute `target_offset`
+
+In Ghidra, the function address is:
+
+* VA = `0x00401060`
+
+The module base is:
+
+* ImageBase = `0x00400000`
+
+So:
+
+* `target_offset = VA - ImageBase`
+* `target_offset = 0x00401060 - 0x00400000 = 0x00001060`
+
+So our offset is:
+
+* `0x01060`
 
 **Ghidra CheatSheet**: [https://ghidra-sre.org/CheatSheet.html](https://ghidra-sre.org/CheatSheet.html)
 
-### **Prepare environment for fuzzing**
+---
 
-Fuzzing binary is a quite resource-demanding tasks, here is a few things you can do to prepare your environment to run a fuzzing campaign smoothly:
+## Prepare environment for fuzzing
 
-* **Disabling automatic debugging**  
-* **Disabling AV scanning**
+Fuzzing is resource-heavy and noisy. A few practical tweaks help:
 
-### **Optimization**
+* Disable automatic debugging popups (they stall fuzzing)
+* Avoid slow I/O locations (cloud folders, network drives)
+* Prefer exclusions rather than global AV disabling (see earlier note)
 
-Having a nice corpus of inputs is a very important aspect of fuzzing. WinAFL offers two options to optimize your corpus with c-min.py. Examples of use:
+---
 
-* **Typical use**  
+## Optimization (corpus minimization)
+
+Input corpora matter. A good corpus makes fuzzing faster and deeper.
+
+WinAFL provides `winafl-cmin.py` to minimize your corpus while keeping coverage.
+
+Examples:
+
+* **Typical use**
+
 ```powershell
   winafl-cmin.py -D D:DRIObin32 -t 100000 -i in -o minset -covtype edge -coverage_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@  
 ```
-* **Dry-run, keep crashes only with 4 workers with a working directory:**  
+
+* **Dry-run, keep crashes only with 4 workers with a working directory:**
+
 ```powershell
   winafl-cmin.py -C --dry-run -w 4 --working-dir D:dir -D D:DRIObin32 -t 10000 -i in -i C:fuzzin -o out_mini -covtype edge -coverage_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@ 
 ```
-* **Read from specific file**  
+
+* **Read from specific file**
+
 ```powershell
   winafl-cmin.py -D D:DRIObin32 -t 100000 -i in -o minset -f foo.ext -covtype edge -coverage_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@ 
 ```
-* **Read from specific file with pattern**  
+
+* **Read from specific file with pattern**
+
 ```powershell
   winafl-cmin.py -D D:DRIObin32 -t 100000 -i in -o minset -f prefix-@@-foo.ext -covtype edge -coverage_module m.dll -target_module test.exe -target_method fuzz -nargs 2 -- test.exe @@ 
 ```
-* **Typical use with static instrumentation**  
+
+* **Typical use with static instrumentation**
+
 ```powershell
   winafl-cmin.py -Y -t 100000 -i in -o minset -- test.exe @@
 ```
 
-`winafl-cmin.py` can take a while to run, so be patient.
+`winafl-cmin.py` can take a while, especially with larger corpora.
 
-### **Running a campaign**
+---
 
-We have patched the binary to make it fuzzable, found the offset of the function we want to test, now let's have fun and run the fuzzer! WinAFL offers different options, let's enumerate them:
+## Running a campaign
 
-* **`t`** – Timeout per fuzzing iteration. If not completed WinAFL restart the program;  
-* **`D`** – DynamoRIO path  
-* **`coverage_module`** – Module(s) that records coverage.  
-* **`target_module`** – Module of the target function.  
-* **`target_offset`** – Virtual offset of the function to be fuzzed from the start of the module;  
-* **`fuzz_iterations`** – Fuzzing iterations before restarting the exec of the program.  
-* **`call_convention`** – Specifying the calling convetion: **`sdtcall`**, **`cdecl`**, and **`thiscall`**.  
-* **`nargs`** – number of arguments the fuzzed function takes. The `this` pointer (used in the **`thiscall`** calling convention) is also considered an argument.
+Now we have:
 
-**WARNING**: We build 2 WinAFL right? Remember, use the correct version of AFL for the target you are looking to fuzz! Here we are going to use the 32 bits version!
+* a patched binary (no GUI blockers),
+* a target parsing function,
+* the correct `target_offset`.
 
-Since our binary is meant to open and read from a text file, create a "in" folder and put a text file with a simple phrase as content.
+Let’s fuzz.
 
-Ok now let's cd into WinAFL_32 build directory and run the following command:
+WinAFL parameters you’ll commonly use:
+
+* **`-t`** — Timeout per iteration
+* **`-D`** — DynamoRIO path
+* **`-coverage_module`** — which module’s coverage you measure
+* **`-target_module`** — module containing the function you hook
+* **`-target_offset`** — function offset from module base
+* **`-fuzz_iterations`** — how many iterations before restarting process
+* **`-call_convention`** — calling convention: `stdcall`, `cdecl`, `thiscall`
+* **`-nargs`** — number of arguments to the target function
+
+### Important: coverage_module pitfalls
+
+If you select the wrong `-coverage_module`, you may see:
+
+* flat coverage (no new edges),
+* extremely low exec/s,
+* no progress despite lots of mutations.
+
+**Rule of thumb**: coverage should be measured in the module that contains the parsing logic.
+In our case, both are `vulnerable_reader.exe`.
+
+### How to determine calling convention / nargs (quick reasoning)
+
+In real targets, this matters a lot.
+
+How to infer it:
+
+* If the function is a normal C-like function and decompiler shows `__cdecl`, prefer `cdecl`.
+* If it’s a member-method / C++ style, you often see `thiscall`.
+* The number of arguments can be derived from:
+
+  * decompiler signature,
+  * stack usage around the call site,
+  * runtime debugging (breakpoints + register/stack inspection).
+
+In our toy target, we follow the expected function signature used by the binary’s call pattern.
+
+---
+
+### Launch WinAFL
+
+**WARNING**: We built two WinAFL versions (32-bit / 64-bit).
+Make sure you use the correct one for your target binary.
+
+Create an `in` folder with at least one tiny seed file. Example: a text file containing a short sentence.
+
+Then run:
+
 ```powershell
 afl-fuzz.exe -i in -o out -t 10000 -D C:WinAFLDynamoRIObin32 -- -fuzz_iterations 500 -coverage_module vulnerable_reader.exe -target_module vulnerable_reader.exe -target_offset 0x01060 -nargs 3 -call_convention thiscall -- vulnerable_reader.exe @@
 ```
 
-If everything went well, you should see this beauty appears:
+If everything is correct, you should see WinAFL running:
 
 ![](image16.png)
 
-Now it's a matter of time. Let the fuzzer run a few minutes then you should see the crash appears.
+Let it run a bit. With this tutorial target, a crash should happen quickly:
 
 ![](image17.png)
 
-### **Analyze crash test**
+---
 
-Here **WinAFL** found a crash really quickly. I designed on purpose a binary very simple to crash in order for this tutorial to be fun to do. As you can see, WinAFL names the crash file with the status and type of crash. You can find them in your out directory > crashes
+## Analyze crash test
+
+WinAFL stores crashing inputs in:
+
+* `out\crashes\`
 
 ![](image18.png)
 
-It's obviously a Stack BoF, since the program was purposely designed for that. However, let's open it in WinDBG and do a root cause analysis of the crash.
+This binary was designed to crash easily, so you should see a classic **stack buffer overflow** style failure.
 
-Start WinDBG and click on `File > Launch Executable (advanced)` then put the path of the vulnerable binary as "Executable" and the `crash_id` file as "Arguments" then click on "Go" to run the program.
+### Reproduce in WinDBG
+
+Start WinDBG:
+
+* `File > Launch Executable (advanced)`
+* Executable: the vulnerable binary
+* Arguments: the crash file path (or use it as input depending on how your binary consumes it)
 
 ![](image19.png)
 
-As you can see WinDBG is immediately screaming that a stack buffer overrun is detected.
+WinDBG will complain about a stack buffer overrun.
 
-### **References**
+### Minimal triage checklist (what you should do next)
 
-* **WinAFL** - [https://github.com/googleprojectzero/winafl](https://github.com/googleprojectzero/winafl)  
-* **DynamoRIO** - [https://dynamorio.org/](https://dynamorio.org/)  
-* **Syzygy** - [https://github.com/google/syzygy/wiki](https://github.com/google/syzygy/wiki)  
-* **Intel PTrace** - [https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/](https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/)  
-* **ProcMon** - [learn.microsoft.com/en-us/sysinternals/downloads/procmon](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon)  
-* **x64dbg** - [x64dbg.com/#start](https://x64dbg.com/#start)  
-* **WinDBG** - [https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools)  
-* **Ghidra CheatSheet** - [https://ghidra-sre.org/CheatSheet.html](https://ghidra-sre.org/CheatSheet.html)  
-* **Windows Internals** - [scorpiosoftware.net/category/windows-internals/](https://scorpiosoftware.net/category/windows-internals/)  
+For real-world targets, don’t stop at “it crashes”. You want to validate the crash class and how controllable it is:
+
+* Run:
+
+  * `!analyze -v`
+* Inspect call stack:
+
+  * `k` / `kv`
+* Inspect registers:
+
+  * `r`
+* Inspect the faulting instruction and surrounding code:
+
+  * `u @eip` / `u @rip`
+* Confirm whether it’s:
+
+  * an access violation,
+  * a stack cookie failure,
+  * an OOB write,
+  * or a controlled overwrite.
+
+Even when exploitability is blocked (stack cookies/CFG/etc.), bugs like this are still valuable as vulnerability reports.
+
+---
+
+## Recap (what you learned)
+
+You now know how to:
+
+* patch a Windows binary to remove interactive UI blockers,
+* locate a parsing function in Ghidra using strings + XREFs,
+* compute a correct WinAFL `target_offset` from VA and image base,
+* run WinAFL with DynamoRIO in persistent fuzzing mode,
+* collect and reproduce crashes in WinDBG.
+
+---
+
+## References
+
+* **WinAFL** — [https://github.com/googleprojectzero/winafl](https://github.com/googleprojectzero/winafl)
+* **DynamoRIO** — [https://dynamorio.org/](https://dynamorio.org/)
+* **Syzygy** — [https://github.com/google/syzygy/wiki](https://github.com/google/syzygy/wiki)
+* **Intel PTrace** — [https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/](https://edc.intel.com/content/www/us/en/design/ipla/software-development-platforms/client/platforms/alder-lake-desktop/12th-generation-intel-core-processors-datasheet-volume-1-of-2/004/intel-processor-trace/)
+* **ProcMon** — [learn.microsoft.com/en-us/sysinternals/downloads/procmon](https://learn.microsoft.com/en-us/sysinternals/downloads/procmon)
+* **x64dbg** — [x64dbg.com/#start](https://x64dbg.com/#start)
+* **WinDBG** — [https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools](https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/debugger-download-tools)
+* **Ghidra CheatSheet** — [https://ghidra-sre.org/CheatSheet.html](https://ghidra-sre.org/CheatSheet.html)
+* **Windows Internals** — [scorpiosoftware.net/category/windows-internals/](https://scorpiosoftware.net/category/windows-internals/)
