@@ -264,3 +264,7 @@ Writing a timeout catcher can be complex because we have to deal with signal han
 ![][image2]  
 You can find an example at `astra_worker/src/worker.rs` at this checkout: `9c05b4f5ef2e3adfba21d094ee347f92a7a5645f` **Note:** the timeout is defaulted to 10ms in the CLI in this example! Voila! Astra is now essentially a rudimentary but complete fuzzer! Hourra!
 
+# Conclusion
+
+
+Astra shows that building a modern fuzzer isn’t magic: it’s a set of simple mechanisms engineered carefully. By combining fast coverage feedback, a shared map, a basic corpus loop, and aggressive mutations, we already get something surprisingly effective and scalable. This project is intentionally educational, so there’s still a lot to improve—scheduling, minimization, and deeper heuristics—but the foundation is solid. If you want to truly understand fuzzing, writing one is the fastest path.
