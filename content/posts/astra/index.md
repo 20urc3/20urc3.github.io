@@ -248,7 +248,8 @@ AFL and others offer a compiler wrapper so that users don't have to pass flags t
 
 To test these wrappers I used `astra_cc` against the tool [htmldoc](https://github.com/michaelrsweet/htmldoc) with: `CC=astra_cc CXX=astra_cc LD=astra_cc ./configure && make -j(nproc)` and run Astra against an instrumented version of `htmldoc`.
 
-![][image1]  
+![][image1.png]  
+
  We are now fuzzing an instrument binary with our own custom coverage!
 
 # Accepting trailing arguments and improving the CLI
@@ -261,7 +262,9 @@ Clap offers a good way to catch trailing arguments, basically anything that is a
 Some bug classes do not result in an immediate crash but in a hang of the target program, for example a function could expect an argument to never be greater than a certain size, but not enforce any verification, which could result in infinite loop. It’s important to catch these errors too without flooding the user with false positives, for that reason the default value of a timeout is quite high and it’s up to the user to adjust it accordingly. 
 
 Writing a timeout catcher can be complex because we have to deal with signal handling and of specific cases, thankfully there is the [crate wait_timeout](https://github.com/alexcrichton/wait-timeout) that already provides a handy `wait_timeout()` function. Of course we need some small adaptations in the worker to return the results, crash or hangs, to the main thread. If we set the CLI default with a timeout of 10ms we can see it catches errors properly:  
-![][image2]  
+
+![][image2.png]  
+
 You can find an example at `astra_worker/src/worker.rs` at this checkout: `9c05b4f5ef2e3adfba21d094ee347f92a7a5645f` **Note:** the timeout is defaulted to 10ms in the CLI in this example! Voila! Astra is now essentially a rudimentary but complete fuzzer! Hourra!
 
 # Conclusion
