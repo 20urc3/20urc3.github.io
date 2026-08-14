@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.Language.Lang }}">
+    {{- partial "head.html" . -}}
+    <body>
+        {{- partial "header.html" . -}}
+        {{/* Footer moved inside #content so it sits at the bottom of the
+             window rather than floating on the desktop below it. */}}
+        <div id="content" class="container">
+        {{- block "main" . }}{{- end }}
+        {{- partial "footer.html" . -}}
+        </div>
+    </body>
+    {{- partial "scripts.html" . -}}
+</html>

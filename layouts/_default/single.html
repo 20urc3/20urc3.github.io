@@ -2,9 +2,11 @@
 
 <div class="row-fluid navmargin article-page">
     <div class="page-header article-header">
-        <h1>{{ .Title }} - {{ .Date.Format "Mon, Jan 2, 2006" }}</h1>
+        <h1>{{ .Title }}</h1>
     </div>
-    <p class="lead">{{ .Params.description }}</p>
+    {{/* Only render the lead when there is one: .lead carries a 2px border,
+         so an empty description drew a stray box at the top of the page. */}}
+    {{ with .Params.description }}<p class="lead">{{ . }}</p>{{ end }}
     {{ .Content }}
     <h4><a href="{{ "" | relURL }}">{{ i18n "backtohome" }}</a></h4>
 </div>

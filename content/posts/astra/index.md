@@ -40,8 +40,8 @@ The tool will select the operating mode:
 The fuzzing strategies, ergo which mutations are interesting or not, are detailed in the blogpost: [binary fuzzing strategies: what works, what doesn't](https://lcamtuf.blogspot.com/2014/08/binary-fuzzing-strategies-what-works.html). The feedback (code-coverage) provided by the instrumentation makes it easy to understand the value of various fuzzing strategies. AFL starts by a series of deterministic mutation strategies:
 
 1. **Walking bit flips:** the first and most rudimentary strategy, it involves performing sequential, ordered bit flips. The stepover is always one bit, the number of bits flipped in a row varies from one to four. Across a large and diverse corpus of input files, the observed yields are:  
-   1. Flipping a single bit: ~70 new paths per one million generated inputs,  
-   2. Flipping two bits in a row: ~20 additional paths per million generated inputs,  
+   1. Flipping a single bit: ~70 new paths per one million generated inputs
+   2. Flipping two bits in a row: ~20 additional paths per million generated inputs
    3. Flipping four bits in a row: ~10 additional paths per million inputs. 
 
 2. **Walking byte flips:** a natural extension of the walking bit flip approach, this method relies on `8-`, `16-`, or `32-bit` wide bitflips with a constant stepover of one byte.   
@@ -52,12 +52,13 @@ The fuzzing strategies, ergo which mutations are interesting or not, are detaile
 4. **Known integers**: the last deterministic approach employed by afl relies on a hardcoded set of integers chosen for their demonstrably elevated likelihood of triggering edge conditions in typical code (e.g., `-1`, `256`, `1024`, `MAX_INT-1`, `MAX_INT`). The fuzzer uses a stepover of one byte to sequentially overwrite existing data in the input file with one of the approximately two dozen "interesting" values, using both endians (the writes are `8`, `16`, and `32-bit` wide). 
 
 5. **Stacked tweaks:** with deterministic strategies exhausted for a particular input file, the fuzzer continues with a never-ending loop of randomized operations that consist of a stacked sequence of:  
-   1. **Single-bit flips:** Attempts to set "interesting" bytes, words, or dwords (both endians)  
-   2. **Addition or subtraction of small integers to bytes:** words, or dwords (both endians)  
-   3. Completely random single-byte sets  
-   4. Block deletion  
-   5. Block duplication via overwrite or insertion  
-   6. Block memset
+   1. Single-bit flips
+   2. Attempts to set "interesting" bytes, words, or dwords (both endians)
+   3. Addition or subtraction of small integers to bytes, words, or dwords (both endians)
+   4. Completely random single-byte sets
+   5. Block deletion
+   6. Block duplication via overwrite or insertion
+   7. Block memset
 
 From the feedback obtained by the instrumentation it’s easy to identify syntax tokens, the detailed approach is detailed in the blogpost: [afl-fuzz: making up grammar with a dictionary in hand](https://lcamtuf.blogspot.com/2015/01/afl-fuzz-making-up-grammar-with.html). In essence mutation strategies are efficient for binary format but perform poorly when it comes to highly structured input such as text, messages or language. The algorithm can identify a syntax token by piggybacking on top of the deterministic, sequential bit flips that are already being performed across the entire file. 
 
@@ -177,7 +178,15 @@ shared_mem[cur_location ^ prev_location]++;
 prev_location = cur_location >> 1;  
 ```
 
-The custom `sancov` implementation that allows to track edge-coverage is statistically linked to the user target binary, how does it write to the edge-map the fuzzer uses to collect coverage? Here comes in place the concepts of `shared_memory` and `mmap`.  [Wikipedia](https://en.wikipedia.org/wiki/Shared_memory) defines shared memory as: “a memory that may be simultaneously accessed by multiple programs with an intent to provide communication among them or avoid redundant copies.” and the [AFL’s documentation](https://afl-1.readthedocs.io/en/latest/about_afl.html) states that: “*The shared_mem[] array is a 64 kB SHM region passed to the instrumented binary by the caller. Every byte set in the output map can be thought of as a hit for a particular (branch_src, branch_dst) tuple in the instrumented code.*”.
+The custom `sancov` implementation that allows to track edge-coverage is statistically linked to the user target binary, how does it write to the edge-map the fuzzer uses to collect coverage? Here comes in place the concepts of `shared_memory` and `mmap`.
+
+[Wikipedia](https://en.wikipedia.org/wiki/Shared_memory) defines shared memory as:
+
+> a memory that may be simultaneously accessed by multiple programs with an intent to provide communication among them or avoid redundant copies.
+
+and the [AFL’s documentation](https://afl-1.readthedocs.io/en/latest/about_afl.html) states that:
+
+> The `shared_mem[]` array is a 64 kB SHM region passed to the instrumented binary by the caller. Every byte set in the output map can be thought of as a hit for a particular (branch_src, branch_dst) tuple in the instrumented code.
 
 Astra is an out-of-process fuzzer, thus it needs a way to communicate with the child processes. To communicate between processes we can use different means called IPC mechanisms, plethora of methods exist: pipes, sockets, shared file, shared memory. Having performance in mind, Astra will use shared memory, this is the fastest a process could share information to another one. To understand this mechanism I crafted a very simple example of a [reader](https://github.com/20urc3/Astra/blob/main/docs/writing_astra/understanding_shm/reader.c) and a [writer](https://github.com/20urc3/Astra/blob/main/docs/writing_astra/understanding_shm/reader.c) using `shm_open` and `mmap` to read and write directly to memory. You can run the example by using the command: `make run`. 
 

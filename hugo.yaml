@@ -24,7 +24,7 @@ params:
 
   description: "Handcrafted bitflipping machines"
   keywords: [cybersecurity, fuzzing]
-  author: "Salim Largo"
+  author: "Salim LARGO"
 
   # Sections listed on the home page, in order
   mainSections:
@@ -40,9 +40,10 @@ params:
 
   # --- Social links in footer (leave unset to hide) ---
   github: "https://github.com/2ourc3"
+  twitter: "https://x.com/2ourc3"
 
   copyright:
-    name: "2ourc3"
+    name: "Salim LARGO"
     url: ""
     prefix: ""
     suffix: ""
@@ -51,6 +52,7 @@ params:
   customCSS:
     - css/syntax.css
     - css/extra.css
+    - css/scheme-win98.css   # colour scheme; remove this line for DOS blue
 
 menu:
   main:

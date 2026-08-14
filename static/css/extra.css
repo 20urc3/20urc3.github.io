@@ -81,7 +81,8 @@ body { font-size: 20px; line-height: 1.5; }
    absolutely positioned where the bullet used to sit. */
 #content ul {
     list-style: none;
-    padding-left: 40px;
+    margin-left: 0;
+    padding-left: 42px;
 }
 #content ul > li { position: relative; }
 #content ul > li::before {
@@ -89,6 +90,37 @@ body { font-size: 20px; line-height: 1.5; }
     position: absolute;
     left: -1em;
 }
+
+/* ---------- Ordered lists: cascading levels ----------
+   Nested <ol> restarts at "1." at every depth, so a sub-item read as a
+   sibling of the item above it. Give each level its own marker style. */
+/* The theme ships `ul, ol { padding: 0; margin: 0 0 20px 20px }`. With no
+   padding the markers are laid outside the content box with nowhere to go,
+   so numbers were clipped or ran into the text. Give them real room and a
+   hanging indent instead. */
+#content ol {
+    list-style-position: outside;
+    margin-left: 0;
+    padding-left: 42px;
+}
+#content ol ol {
+    margin-left: 0;
+    padding-left: 38px;
+}
+
+/* Each depth gets its own marker, so a sub-item never looks like a sibling */
+#content ol            { list-style-type: decimal; }
+#content ol ol         { list-style-type: lower-alpha; }
+#content ol ol ol      { list-style-type: lower-roman; }
+#content ol ol ol ol   { list-style-type: decimal; }
+
+/* Breathing room so the hierarchy reads at a glance */
+#content ol > li { margin-bottom: 10px; }
+#content ol ol {
+    margin-top: 10px;
+    margin-bottom: 4px;
+}
+#content ol ol > li { margin-bottom: 4px; }
 
 /* ---------- Images ----------
    Bootstrap 2 has no responsive images; post screenshots are wide.
@@ -139,15 +171,24 @@ body { font-size: 20px; line-height: 1.5; }
     line-height: 1.45;
 }
 
-/* Inline code: amber on black, distinct from block code */
+/* Inline code: amber on black, distinct from block code.
+   Must wrap -- `white-space: nowrap` let long shell one-liners run past
+   the right edge of the page instead of breaking. */
 #content code {
     background-color: #000;
     color: #fc0;
     border: none;
     border-radius: 0;
     padding: 1px 4px;
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
 }
+
+/* The theme ships `strong { font-weight: normal }`, so bold text was not
+   actually bold. Colour is set per-scheme. */
+#content strong,
+#content b { font-weight: bold; }
 /* ...but inline rules must not leak into highlighted blocks */
 #content .highlight code,
 #content pre code {
@@ -181,6 +222,16 @@ body { font-size: 20px; line-height: 1.5; }
 #content .article-page h4   { font-size: 22px; font-weight: bold; }
 #content .article-page h5,
 #content .article-page h6   { font-weight: bold; }
+
+/* Centred headings on article pages only. The home page index keeps its
+   left alignment, so "Articles" / "CVE" / the year headings are unaffected.
+   These beat the left-align rule below on specificity (id + class + type). */
+#content .article-header h1,
+#content .article-page h2,
+#content .article-page h3,
+#content .article-page h4,
+#content .article-page h5,
+#content .article-page h6 { text-align: center; }
 
 /* ---------- Horizontal rules ----------
    Theme ships `hr { margin: 6px 0 7px }`, so a rule sat flush against the

@@ -1,0 +1,342 @@
+/* ============================================================
+   Colour scheme: WINDOWS 98
+   ------------------------------------------------------------
+   Teal desktop, silver window chrome with 3D bevels, navy
+   gradient title bar, sunken white code fields.
+   Swap schemes from hugo.yaml -> params.customCSS. Loaded last,
+   so it overrides the blue defaults in extra.css.
+   All values verified >= 4.6:1 against their background.
+   ============================================================ */
+
+/* Desktop */
+html, body {
+    background-color: #008080;
+    color: #000000;
+}
+
+/* The page itself becomes a raised window */
+#content.container {
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf;
+    padding: 16px 20px 24px;
+    margin-top: 18px;
+    margin-bottom: 24px;
+}
+
+#content p,
+#content li,
+#content td,
+#content h1,
+#content h2,
+#content h3,
+#content h4,
+#content h5,
+#content h6,
+#content .lead { color: #000000; }
+
+/* Title bar */
+.page-header {
+    background: #000080;
+    background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+    padding: 6px 10px;
+    margin: 0 0 20px;
+    border: none;
+}
+#content .page-header h1 { color: #ffffff; }
+
+/* Links */
+#content a { color: #0000cc; text-decoration: underline; }
+#content a:visited { color: #660066; }
+#content a:hover,
+#content a:focus { color: #ffffff; background: #000080; text-decoration: none; }
+
+/* Menu bar */
+.navbar-inverse .navbar-inner {
+    background: #c0c0c0;
+    border-bottom: 2px solid #808080;
+    box-shadow: inset 0 1px 0 #ffffff;
+}
+.navbar .brand,
+.navbar .nav > li > a { color: #000000; }
+.navbar .nav > li > a:hover { color: #ffffff; background: #000080; }
+
+/* Separators: engraved groove */
+#content hr {
+    border: none;
+    border-top: 1px solid #808080;
+    border-bottom: 1px solid #ffffff;
+    height: 0;
+}
+
+/* ---------- Code: sunken white field ---------- */
+#content .highlight {
+    background-color: #ffffff;
+    border-top: 2px solid #808080;
+    border-left: 2px solid #808080;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    box-shadow: inset 1px 1px 0 #000000;
+}
+#content .highlight pre,
+#content pre.chroma,
+#content .chroma { background-color: #ffffff; color: #000000; }
+#content code {
+    background-color: #ffffff;
+    color: #000080;
+    border: 1px solid #808080;
+}
+#content .highlight code,
+#content pre code { border: none; background: transparent; }
+
+/* Light-background syntax palette */
+#content .chroma .k,  #content .chroma .kc, #content .chroma .kd,
+#content .chroma .kn, #content .chroma .kp, #content .chroma .kr,
+#content .chroma .kt, #content .chroma .nf, #content .chroma .fm,
+#content .chroma .nc, #content .chroma .nn        { color: #000080; }
+#content .chroma .s,  #content .chroma .sa, #content .chroma .sb,
+#content .chroma .sc, #content .chroma .s1, #content .chroma .s2,
+#content .chroma .se, #content .chroma .sh, #content .chroma .si,
+#content .chroma .sx, #content .chroma .sr, #content .chroma .ss,
+#content .chroma .sd                              { color: #a31515; }
+#content .chroma .m,  #content .chroma .mb, #content .chroma .mf,
+#content .chroma .mh, #content .chroma .mi, #content .chroma .mo,
+#content .chroma .il                              { color: #098658; }
+#content .chroma .c,  #content .chroma .ch, #content .chroma .cm,
+#content .chroma .cp, #content .chroma .cpf,
+#content .chroma .c1, #content .chroma .cs        { color: #5a7a5a; }
+#content .chroma .o,  #content .chroma .ow,
+#content .chroma .n,  #content .chroma .nx,
+#content .chroma .nv, #content .chroma .na,
+#content .chroma .nb, #content .chroma .p         { color: #000000; }
+#content .chroma .gp                              { color: #6a4a00; }
+#content .chroma .gt, #content .chroma .err       { color: #b00000; }
+
+/* ============================================================
+   FULL WINDOWS 98
+   ============================================================ */
+
+/* ---------- UI font ----------
+   Win98 chrome and body copy used MS Sans Serif / Tahoma. Code keeps
+   the monospace stack from extra.css. */
+body,
+.navbar,
+.navbar .brand,
+.navbar .nav > li > a,
+#content,
+#content p,
+#content li,
+#content td,
+#content h1, #content h2, #content h3,
+#content h4, #content h5, #content h6 {
+    font-family: Tahoma, "MS Sans Serif", Geneva, Verdana, sans-serif;
+}
+
+/* ---------- Selection ---------- */
+::selection { background: #000080; color: #ffffff; }
+
+/* ---------- Raised buttons (the "back to home" link) ---------- */
+#content h4 a {
+    display: inline-block;
+    background: #c0c0c0;
+    color: #000000;
+    text-decoration: none;
+    padding: 5px 16px;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf;
+}
+#content h4 a:hover { background: #c0c0c0; color: #000000; }
+#content h4 a:active {
+    border-top: 2px solid #000000;
+    border-left: 2px solid #000000;
+    border-right: 2px solid #ffffff;
+    border-bottom: 2px solid #ffffff;
+    box-shadow: inset 1px 1px 0 #808080;
+    padding: 6px 15px 4px 17px;
+}
+
+/* ---------- Scrollbars ----------
+   16px wide, dithered track, raised thumb, arrow buttons at both ends.
+   WebKit/Blink gets the full treatment; Firefox only supports the
+   two-colour form, so it gets that as a fallback. */
+* { scrollbar-color: #c0c0c0 #dfdfdf; }
+
+::-webkit-scrollbar { width: 16px; height: 16px; }
+
+/* Track: the classic 50% dither of #c0c0c0 over white */
+::-webkit-scrollbar-track {
+    background-color: #ffffff;
+    background-image: repeating-conic-gradient(#c0c0c0 0% 25%, #ffffff 0% 50%);
+    background-size: 2px 2px;
+}
+
+/* Thumb: raised, same bevel as a button */
+::-webkit-scrollbar-thumb {
+    background: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf;
+    min-height: 24px;
+}
+
+/* Arrow buttons */
+::-webkit-scrollbar-button {
+    background-color: #c0c0c0;
+    border-top: 2px solid #ffffff;
+    border-left: 2px solid #ffffff;
+    border-right: 2px solid #000000;
+    border-bottom: 2px solid #000000;
+    box-shadow: inset -1px -1px 0 #808080, inset 1px 1px 0 #dfdfdf;
+    background-repeat: no-repeat;
+    background-position: center;
+    display: block;
+    height: 16px;
+    width: 16px;
+}
+::-webkit-scrollbar-button:vertical:decrement {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M3 0l3 4H0z' fill='%23000'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:vertical:increment {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='4'%3E%3Cpath d='M3 4L0 0h6z' fill='%23000'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:horizontal:decrement {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7'%3E%3Cpath d='M0 3L4 0v6z' fill='%23000'/%3E%3C/svg%3E");
+}
+::-webkit-scrollbar-button:horizontal:increment {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='4' height='7'%3E%3Cpath d='M4 3L0 6V0z' fill='%23000'/%3E%3C/svg%3E");
+}
+/* Suppress the doubled buttons WebKit adds at each end */
+::-webkit-scrollbar-button:vertical:start:increment,
+::-webkit-scrollbar-button:vertical:end:decrement,
+::-webkit-scrollbar-button:horizontal:start:increment,
+::-webkit-scrollbar-button:horizontal:end:decrement {
+    display: none;
+}
+::-webkit-scrollbar-corner { background: #c0c0c0; }
+
+/* ---------- Menu bar ----------
+   Raised Win98 menu strip pinned to the very top, spanning the viewport,
+   with its items centred on the same 960px column as the content window. */
+.navbar-fixed-top { top: 0; margin: 0; }
+.navbar-inner { padding-left: 0; padding-right: 0; }
+.navbar-inverse .navbar-inner {
+    background: #c0c0c0;
+    border-top: 1px solid #ffffff;
+    border-bottom: 1px solid #808080;
+    box-shadow: inset 0 -1px 0 #dfdfdf;
+}
+.navbar-inner > .container {
+    max-width: 960px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: auto;
+    padding-left: 20px;
+    padding-right: 20px;
+}
+/* Menu items: flat until hovered, then the classic navy highlight */
+.navbar .brand { padding: 0 10px; font-weight: bold; }
+.navbar .nav > li > a { padding: 0 12px; }
+.navbar .nav > li > a:hover,
+.navbar .nav > li > a:focus { color: #ffffff; background: #000080; }
+
+/* ---------- Window fills the viewport ----------
+   Flex column so the status bar is pushed to the bottom edge no matter
+   how little content there is. 44 + 20 = the vertical margins below. */
+#content.container {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    min-height: calc(100vh - 64px);
+    margin-top: 44px;
+    margin-bottom: 20px;
+    padding: 0 20px 0;
+}
+
+/* Title bar sits flush against the window edges */
+#content .navmargin { margin-top: 0; }
+.page-header {
+    margin: 0 -20px 22px;
+    padding: 6px 12px;
+}
+
+/* ---------- Status bar ---------- */
+#content > footer.statusbar {
+    margin: 24px -20px 0;
+    margin-top: auto;
+    padding: 3px;
+    display: flex;
+    gap: 3px;
+    background: #c0c0c0;
+    border-top: 1px solid #dfdfdf;
+}
+.statusbar-panel {
+    padding: 3px 10px;
+    font-size: 15px;
+    color: #000000;
+    border-top: 1px solid #808080;
+    border-left: 1px solid #808080;
+    border-right: 1px solid #ffffff;
+    border-bottom: 1px solid #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.statusbar-grow { flex: 1 1 auto; text-align: right; }
+#content .statusbar-panel a { text-decoration: none; }
+#content .statusbar-panel a:hover { color: #ffffff; background: #000080; }
+
+/* Bold text: theme renders <strong> white, invisible on silver */
+#content strong,
+#content b { color: #000000; }
+
+/* ---------- Italics ----------
+   The theme renders <em> as /slash-wrapped/ text with font-style:normal --
+   a plaintext convention for the DOS font, which had no italic face. The
+   Win98 stack (Tahoma) does, so use real italics and drop the slashes. */
+#content em,
+#content i,
+#content cite,
+#content var,
+#content dfn {
+    font-style: italic;
+    color: #000000;
+}
+#content em::before,   #content em::after,
+#content i::before,    #content i::after,
+#content cite::before, #content cite::after,
+#content var::before,  #content var::after,
+#content dfn::before,  #content dfn::after {
+    content: none;
+}
+
+/* ---------- Blockquotes ----------
+   Rule on the left, indented, italic, in a softer grey than body copy.
+   #444 holds 5.35:1 on the silver window -- #555 and lighter drop below
+   4.5:1, so this is about as light as it can go and stay readable. */
+#content blockquote {
+    background: none;
+    border: none;
+    border-left: 4px solid #808080;
+    box-shadow: none;
+    margin: 22px 0 22px 18px;
+    padding: 2px 0 2px 18px;
+    font-style: italic;
+    color: #444444;
+}
+#content blockquote p { margin: 0; color: #444444; }
+#content blockquote p + p { margin-top: 12px; }
+#content blockquote code {
+    background: transparent;
+    border: none;
+    color: #2a2a5a;
+    font-style: normal;
+    padding: 0;
+}

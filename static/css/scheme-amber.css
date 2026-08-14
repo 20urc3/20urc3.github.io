@@ -1,0 +1,77 @@
+/* ============================================================
+   Colour scheme: AMBER CRT  (P3 amber phosphor monitor)
+   ------------------------------------------------------------
+   Swap schemes from hugo.yaml -> params.customCSS. Loaded last,
+   so it overrides the blue defaults in extra.css. Remove that
+   one line to fall back to the theme's DOS blue.
+   All values verified >= 6.2:1 against their background.
+   ============================================================ */
+
+html, body {
+    background-color: #120c00;
+    color: #ffb000;
+}
+#content p,
+#content li,
+#content td { color: #ffb000; }
+
+/* Headings: theme sets these white */
+#content h1,
+#content h2,
+#content h3,
+#content h4,
+#content h5,
+#content h6,
+#content .lead { color: #ffd27f; }
+
+/* Title bar: inverted, dark text on amber */
+.page-header { background: #cc8800; }
+#content .page-header h1 { color: #120c00; }
+
+/* Links: theme yellow -> pale amber; hover keeps the theme's burnt fill */
+#content a { color: #fff0a0; }
+#content a:hover,
+#content a:focus { color: #120c00; background: #ffb000; }
+
+/* Navbar: theme grey bar -> amber bar with dark text */
+.navbar-inverse .navbar-inner { background: #ffb000; }
+.navbar .brand,
+.navbar .nav > li > a { color: #120c00; }
+.navbar .nav > li > a:hover { color: #120c00; background: #ffd27f; }
+
+/* Rules */
+#content hr { border-bottom-color: #cc8800; }
+
+/* ---------- Code ---------- */
+#content .highlight {
+    background-color: #0a0600;
+    border-color: #cc8800;
+}
+#content .highlight pre,
+#content pre.chroma,
+#content .chroma { background-color: #0a0600; color: #ffb000; }
+#content code { background-color: #0a0600; color: #ffcc66; }
+
+/* Amber-toned syntax tokens, replacing the multi-hue `vim` palette */
+#content .chroma .k,  #content .chroma .kc, #content .chroma .kd,
+#content .chroma .kn, #content .chroma .kp, #content .chroma .kr,
+#content .chroma .kt                              { color: #ffd27f; }
+#content .chroma .s,  #content .chroma .sa, #content .chroma .sb,
+#content .chroma .sc, #content .chroma .s1, #content .chroma .s2,
+#content .chroma .se, #content .chroma .sh, #content .chroma .si,
+#content .chroma .sx, #content .chroma .sr, #content .chroma .ss,
+#content .chroma .sd                              { color: #ff9142; }
+#content .chroma .m,  #content .chroma .mb, #content .chroma .mf,
+#content .chroma .mh, #content .chroma .mi, #content .chroma .mo,
+#content .chroma .il                              { color: #ffcc66; }
+#content .chroma .nf, #content .chroma .fm,
+#content .chroma .nc, #content .chroma .nn        { color: #ffe0a8; }
+#content .chroma .c,  #content .chroma .ch, #content .chroma .cm,
+#content .chroma .cp, #content .chroma .cpf,
+#content .chroma .c1, #content .chroma .cs        { color: #b8863c; }
+#content .chroma .o,  #content .chroma .ow,
+#content .chroma .n,  #content .chroma .nx,
+#content .chroma .nv, #content .chroma .na,
+#content .chroma .nb, #content .chroma .p         { color: #ffb000; }
+#content .chroma .gp                              { color: #ffcc66; }
+#content .chroma .gt, #content .chroma .err       { color: #ff6b3d; }
