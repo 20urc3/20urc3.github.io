@@ -84,15 +84,15 @@ discussed earlier on, instead of attempting to remove no-op blocks, the tool per
 
 After reading the AFL technical specification, it appears that AFL is an out-of-process (meaning it spawns a child process) coverage-guided fuzzer. The big picture of AFL architecture can summarize as follow:
 
-1. The target under evaluation is compiled with a custom compiler that inserts instrumentation, then spawned as a child-process.  
-2. The testcases are mutated with deterministics then later random strategies.  
-3. The coverage (edge) is collected every fuzzing round, along with a block hit count.  
-4. Interesting testcases are kept in queue and prioritized for future fuzzing rounds.  
-5. Dictionaries are deduced from bytes that satisfy a simple property.  
-6. Crashes are classified as unique based on their tuples.  
-7. Exploitation exploration mode uses mutation to produce interesting similar testcases.  
-8. Parallelization is achieved through shared QUEUE with new testcases tuples.  
-9. Binary-only fuzzing relies on custom QEMU userland instrumentation.
+- The target under evaluation is compiled with a custom compiler that inserts instrumentation, then spawned as a child-process.  
+- The testcases are mutated with deterministics then later random strategies.  
+- The coverage (edge) is collected every fuzzing round, along with a block hit count.  
+- Interesting testcases are kept in queue and prioritized for future fuzzing rounds.  
+- Dictionaries are deduced from bytes that satisfy a simple property.  
+- Crashes are classified as unique based on their tuples.  
+- Exploitation exploration mode uses mutation to produce interesting similar testcases.  
+- Parallelization is achieved through shared QUEUE with new testcases tuples.  
+- Binary-only fuzzing relies on custom QEMU userland instrumentation.
 
 Of course, dozens of other fuzzers exist and each have their own specificity, however, AFL laid out the way for modern fuzzers and we can find similar features in a lot of recent projects. A great way to learn more is to read the code of other state-of-the-art fuzzer such as [AFL++](https://github.com/AFLplusplus/AFLplusplus), [LibAFL](https://github.com/AFLplusplus/LibAFL), [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz), etc. 
 

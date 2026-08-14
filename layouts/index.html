@@ -1,0 +1,60 @@
+{{ define "main" }}
+
+<div class="row-fluid navmargin">
+    <div class="page-header">
+        <h1>{{ .Site.Params.mainpagetitle | default .Site.Title }}</h1>
+    </div>
+</div>
+
+<div class="row-fluid">
+    <div class="span12 home-index">
+        {{ with .Site.Params.mainpagedesc }}<p>{{ . }}</p>{{ end }}
+
+        {{/* ---------- Articles ---------- */}}
+        {{ with where .Site.RegularPages "Section" "posts" }}
+        <h2>{{ $.Site.Params.articlesheading | default "Articles" }}</h2>
+        <ul>
+            {{ range . }}
+            <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+            {{ end }}
+        </ul>
+        {{ end }}
+
+        {{/* ---------- CVEs, grouped by the year in the CVE ID ----------
+             Not .Date: every bug here is dated its publish day (2026-01-15),
+             so .Date would collapse them all under one heading. Order of
+             preference: explicit `year:` front matter, then the CVE-YYYY in
+             the title, then the page date as a last resort. */}}
+        {{ $bugs := where .Site.RegularPages "Section" "bugs" }}
+        {{ $items := slice }}
+        {{ range $bugs }}
+            {{ $year := "" }}
+            {{ with .Params.year }}
+                {{ $year = printf "%v" . }}
+            {{ else }}
+                {{ $m := findRE "(?:19|20)[0-9]{2}" .Title 1 }}
+                {{ if $m }}{{ $year = index $m 0 }}{{ else }}{{ $year = .Date.Format "2006" }}{{ end }}
+            {{ end }}
+            {{ $items = $items | append (dict "year" $year "page" .) }}
+        {{ end }}
+
+        {{ with $items }}
+        <h2>{{ $.Site.Params.cveheading | default "CVE" }}</h2>
+        {{ $years := slice }}
+        {{ range . }}
+            {{ if not (in $years .year) }}{{ $years = $years | append .year }}{{ end }}
+        {{ end }}
+        {{ range sort $years "value" "desc" }}
+            {{ $y := . }}
+            <h3>{{ $y }}</h3>
+            <ul>
+                {{ range where $items "year" $y }}
+                <li><a href="{{ .page.RelPermalink }}">{{ .page.Title }}</a></li>
+                {{ end }}
+            </ul>
+        {{ end }}
+        {{ end }}
+    </div>
+</div>
+
+{{ end }}

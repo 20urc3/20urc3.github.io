@@ -1,6 +1,8 @@
 baseURL: "https://2ourc3.com/"
 title: 2ourc3
-theme: PaperMod
+theme: hugo.386
+languageCode: en
+defaultContentLanguage: en
 
 enableRobotsTXT: true
 buildDrafts: false
@@ -12,92 +14,44 @@ minify:
   minifyOutput: true
 
 params:
-  env: production # to enable google analytics, opengraph, twitter-cards and schema.
-  title: 2ourc3
+  # --- Home page ---
+  mainpagetitle: "2ourc3 - Salim LARGO"
+  mainpagedesc: ""
+
+  # Section headings on the home page
+  articlesheading: "Articles"
+  cveheading: "CVE"
+
   description: "Handcrafted bitflipping machines"
   keywords: [cybersecurity, fuzzing]
-  author: 2ourc3
-  #images: ["<link or path of image for opengraph, twitter-cards>"]
-  DateFormat: "January 2, 2006"
-  defaultTheme: auto # dark, light
-  disableThemeToggle: false
+  author: "Salim Largo"
 
-  ShowReadingTime: true
-  ShowShareButtons: false
-  ShowPostNavLinks: false
-  ShowBreadCrumbs: true
-  ShowCodeCopyButtons: false
-  ShowWordCount: true
-  ShowRssButtonInSectionTermList: true
-  UseHugoToc: true
-  disableSpecial1stPost: false
-  disableScrollToTop: false
-  comments: false
-  hidemeta: true
-  hideSummary: false
-  showtoc: false
-  tocopen: false
+  # Sections listed on the home page, in order
   mainSections:
     - posts
     - bugs
 
-  assets:
-    # disableHLJS: true # to disable highlight.js
-    # disableFingerprinting: true
-    favicon: "/icon_rabbit.ico"
-    favicon16x16: "<link / abs url>"
-    favicon32x32: "<link / abs url>"
-    apple_touch_icon: "<link / abs url>"
-    safari_pinned_tab: "<link / abs url>"
-    css:
-      - css/terminal-home.css
-      
-  label:
-    text: "home"
-    iconHeight: 25
+  # --- Loading animation (BOOTSTRA.386 CRT effect) ---
+  loadfastload: true       # true = skip the boot animation
+  loadspeedfactor: 1.0
+  loadonepass: true
 
-  # profile-mode
-  profileMode:
-    enabled: false # needs to be explicitly set
-    title: 2ourc3
-    subtitle: "Handcrafted bitflipping machines."
-    #imageUrl: "<img location>"
-    #imageWidth: 120
-    #imageHeight: 120
-    #imageTitle: my image
-    buttons:
-      - name: Posts
-        url: posts
-      - name: Tags
-        url: tags
+  showhugo: false
 
-  # home-info mode
-  homeInfoParams:
-    Title: "Handcrafted bitflipping machines."
-  analytics:
-    google:
-      SiteVerificationTag: "XYZabc"
-    bing:
-      SiteVerificationTag: "XYZabc"
-    yandex:
-      SiteVerificationTag: "XYZabc"
+  # --- Social links in footer (leave unset to hide) ---
+  github: "https://github.com/2ourc3"
 
-  cover:
-    hidden: true # hide everywhere but not in structured data
-    hiddenInList: true # hide on list pages and home
-    hiddenInSingle: true # hide on single page
+  copyright:
+    name: "2ourc3"
+    url: ""
+    prefix: ""
+    suffix: ""
 
-  # for search
-  # https://fusejs.io/api/options.html
-  fuseOpts:
-    isCaseSensitive: false
-    shouldSort: true
-    location: 0
-    distance: 1000
-    threshold: 0.4
-    minMatchCharLength: 0
-    limit: 10 # refer: https://www.fusejs.io/api/methods.html#search
-    keys: ["title", "permalink", "summary", "content"]
+  # Extra stylesheets/scripts layered on top of the theme
+  customCSS:
+    - css/syntax.css
+    - css/extra.css
+
 menu:
   main:
     - identifier: posts
@@ -109,7 +63,10 @@ menu:
       url: /bugs/
       weight: 2
 
-# Read: https://github.com/adityatelange/hugo-PaperMod/wiki/FAQs#using-hugos-syntax-highlighter-chroma
+taxonomies:
+  category: categories
+  tag: tags
+
 pygmentsUseClasses: true
 markup:
   goldmark:
@@ -117,8 +74,3 @@ markup:
       unsafe: true
   highlight:
     noClasses: false
-    # anchorLineNos: true
-    # codeFences: true
-    # guessSyntax: true
-    # lineNos: true
-    # style: monokai

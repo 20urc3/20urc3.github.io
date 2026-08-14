@@ -1,92 +1,40 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Bugs on 2ourc3</title>
-    <link>http://localhost:1313/bugs/</link>
+    <link>https://2ourc3.com/bugs/</link>
     <description>Recent content in Bugs on 2ourc3</description>
-    <generator>Hugo -- 0.152.2</generator>
+    <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Thu, 15 Jan 2026 19:00:00 +0100</lastBuildDate>
-    <atom:link href="http://localhost:1313/bugs/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://2ourc3.com/bugs/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>CVE-2025-43254 - OOB-RW in MacOS libmacho.dylib</title>
-      <link>http://localhost:1313/bugs/cve_2025_43254/</link>
+      <link>https://2ourc3.com/bugs/cve_2025_43254/</link>
       <pubDate>Thu, 15 Jan 2026 13:50:07 +0100</pubDate>
-      <guid>http://localhost:1313/bugs/cve_2025_43254/</guid>
-      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2025-43254&lt;br&gt;
-&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;libmacho.dylib&lt;/code&gt;&lt;br&gt;
-&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Out-of-bounds memory access&lt;br&gt;
-&lt;strong&gt;Vendor:&lt;/strong&gt; Apple&lt;br&gt;
-&lt;strong&gt;Severity:&lt;/strong&gt; Medium&lt;br&gt;
-&lt;strong&gt;Product:&lt;/strong&gt; macOS&lt;br&gt;
-&lt;strong&gt;Affected Versions:&lt;/strong&gt; Sonoma, Sequoia, Ventura&lt;br&gt;
-&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed by vendor (Apple Security Update)&lt;br&gt;
-&lt;strong&gt;Credit:&lt;/strong&gt; 2ourc3&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
-&lt;p&gt;A security vulnerability has been identified in macOS’s &lt;code&gt;libmacho.dylib&lt;/code&gt;. The bug allows an attacker to trigger an &lt;strong&gt;out-of-bounds memory access&lt;/strong&gt; using a specially crafted &lt;strong&gt;Mach-O fat binary&lt;/strong&gt;, potentially leading to &lt;strong&gt;information disclosure&lt;/strong&gt; or &lt;strong&gt;remote code execution&lt;/strong&gt; (depending on memory layout and exploitation constraints).&lt;/p&gt;</description>
+      <guid>https://2ourc3.com/bugs/cve_2025_43254/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2025-43254&lt;br&gt;&#xA;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;libmacho.dylib&lt;/code&gt;&lt;br&gt;&#xA;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Out-of-bounds memory access&lt;br&gt;&#xA;&lt;strong&gt;Vendor:&lt;/strong&gt; Apple&lt;br&gt;&#xA;&lt;strong&gt;Severity:&lt;/strong&gt; Medium&lt;br&gt;&#xA;&lt;strong&gt;Product:&lt;/strong&gt; macOS&lt;br&gt;&#xA;&lt;strong&gt;Affected Versions:&lt;/strong&gt; Sonoma, Sequoia, Ventura&lt;br&gt;&#xA;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed by vendor (Apple Security Update)&lt;br&gt;&#xA;&lt;strong&gt;Credit:&lt;/strong&gt; 2ourc3&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;&#xA;&lt;p&gt;A security vulnerability has been identified in macOS’s &lt;code&gt;libmacho.dylib&lt;/code&gt;. The bug allows an attacker to trigger an &lt;strong&gt;out-of-bounds memory access&lt;/strong&gt; using a specially crafted &lt;strong&gt;Mach-O fat binary&lt;/strong&gt;, potentially leading to &lt;strong&gt;information disclosure&lt;/strong&gt; or &lt;strong&gt;remote code execution&lt;/strong&gt; (depending on memory layout and exploitation constraints).&lt;/p&gt;</description>
     </item>
     <item>
       <title>CVE-2024-6773 - Type confusion in V8 Turboshaft</title>
-      <link>http://localhost:1313/bugs/cve_2024_6773/</link>
+      <link>https://2ourc3.com/bugs/cve_2024_6773/</link>
       <pubDate>Thu, 15 Jan 2026 19:00:00 +0100</pubDate>
-      <guid>http://localhost:1313/bugs/cve_2024_6773/</guid>
-      <description>&lt;ul&gt;
-&lt;li&gt;&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2024-6773
-&lt;strong&gt;Component:&lt;/strong&gt; V8 Turboshaft (Load Elimination)
-&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Type confusion → memory corruption (stale pointer across GC)
-&lt;strong&gt;Vendor:&lt;/strong&gt; Google
-&lt;strong&gt;Product:&lt;/strong&gt; Chrome / V8 JavaScript Engine
-&lt;strong&gt;Affected Versions:&lt;/strong&gt; Chrome versions prior to M126
-&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed (V8 main + backports to M126 Stable / M127 Beta)
-&lt;strong&gt;Severity:&lt;/strong&gt; Chrome S1
-&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
-&lt;p&gt;CVE-2024-6773 is a critical &lt;strong&gt;type confusion&lt;/strong&gt; vulnerability in the &lt;strong&gt;V8 Turboshaft&lt;/strong&gt; compiler pipeline, specifically within the &lt;strong&gt;Load Elimination&lt;/strong&gt; optimization phase.&lt;/p&gt;</description>
+      <guid>https://2ourc3.com/bugs/cve_2024_6773/</guid>
+      <description>&lt;ul&gt;&#xA;&lt;li&gt;&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2024-6773&#xA;&lt;strong&gt;Component:&lt;/strong&gt; V8 Turboshaft (Load Elimination)&#xA;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Type confusion → memory corruption (stale pointer across GC)&#xA;&lt;strong&gt;Vendor:&lt;/strong&gt; Google&#xA;&lt;strong&gt;Product:&lt;/strong&gt; Chrome / V8 JavaScript Engine&#xA;&lt;strong&gt;Affected Versions:&lt;/strong&gt; Chrome versions prior to M126&#xA;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed (V8 main + backports to M126 Stable / M127 Beta)&#xA;&lt;strong&gt;Severity:&lt;/strong&gt; Chrome S1&#xA;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;&#xA;&lt;p&gt;CVE-2024-6773 is a critical &lt;strong&gt;type confusion&lt;/strong&gt; vulnerability in the &lt;strong&gt;V8 Turboshaft&lt;/strong&gt; compiler pipeline, specifically within the &lt;strong&gt;Load Elimination&lt;/strong&gt; optimization phase.&lt;/p&gt;</description>
     </item>
     <item>
       <title>CVE-2024-11612 - Infinite loop DoS in 7-Zip CopyCoder</title>
-      <link>http://localhost:1313/bugs/cve_2024_11612/</link>
+      <link>https://2ourc3.com/bugs/cve_2024_11612/</link>
       <pubDate>Thu, 15 Jan 2026 19:00:00 +0100</pubDate>
-      <guid>http://localhost:1313/bugs/cve_2024_11612/</guid>
-      <description>&lt;hr&gt;
-&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2024-11612
-&lt;strong&gt;Component:&lt;/strong&gt; 7-Zip (CopyCoder / stream processing)
-&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Infinite loop → Denial of Service (DoS)
-&lt;strong&gt;Vendor:&lt;/strong&gt; 7-Zip
-&lt;strong&gt;Product:&lt;/strong&gt; 7-Zip
-&lt;strong&gt;Impact:&lt;/strong&gt; Unbounded decompression loop / CPU hang
-&lt;strong&gt;Discoverer / Credit:&lt;/strong&gt; 2ourc3 (Salim Largo)
-&lt;strong&gt;Disclosure:&lt;/strong&gt; Reported via Zero Day Initiative (ZDI)
-&lt;strong&gt;Advisory:&lt;/strong&gt; ZDI-24-1606&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
-&lt;p&gt;During a fuzzing campaign against &lt;strong&gt;7-Zip&lt;/strong&gt;, an input was discovered that causes the decompression process to run &lt;strong&gt;forever&lt;/strong&gt;. When the crafted archive is opened, 7-Zip remains stuck in a “decompressing” state without terminating, resulting in a &lt;strong&gt;denial-of-service&lt;/strong&gt; condition.&lt;/p&gt;</description>
+      <guid>https://2ourc3.com/bugs/cve_2024_11612/</guid>
+      <description>&lt;hr&gt;&#xA;&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2024-11612&#xA;&lt;strong&gt;Component:&lt;/strong&gt; 7-Zip (CopyCoder / stream processing)&#xA;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Infinite loop → Denial of Service (DoS)&#xA;&lt;strong&gt;Vendor:&lt;/strong&gt; 7-Zip&#xA;&lt;strong&gt;Product:&lt;/strong&gt; 7-Zip&#xA;&lt;strong&gt;Impact:&lt;/strong&gt; Unbounded decompression loop / CPU hang&#xA;&lt;strong&gt;Discoverer / Credit:&lt;/strong&gt; 2ourc3 (Salim Largo)&#xA;&lt;strong&gt;Disclosure:&lt;/strong&gt; Reported via Zero Day Initiative (ZDI)&#xA;&lt;strong&gt;Advisory:&lt;/strong&gt; ZDI-24-1606&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;&#xA;&lt;p&gt;During a fuzzing campaign against &lt;strong&gt;7-Zip&lt;/strong&gt;, an input was discovered that causes the decompression process to run &lt;strong&gt;forever&lt;/strong&gt;. When the crafted archive is opened, 7-Zip remains stuck in a “decompressing” state without terminating, resulting in a &lt;strong&gt;denial-of-service&lt;/strong&gt; condition.&lt;/p&gt;</description>
     </item>
     <item>
       <title>CVE-2024-53589 - Buffer overflow in GNU Objdump tekhex</title>
-      <link>http://localhost:1313/bugs/cve_2024_53589/</link>
+      <link>https://2ourc3.com/bugs/cve_2024_53589/</link>
       <pubDate>Thu, 15 Jan 2026 13:49:50 +0100</pubDate>
-      <guid>http://localhost:1313/bugs/cve_2024_53589/</guid>
-      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
-&lt;p&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2024-53589&lt;br&gt;
-&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;objdump&lt;/code&gt; / BFD &lt;code&gt;tekhex&lt;/code&gt; parser&lt;br&gt;
-&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Buffer overflow / out-of-bounds read&lt;br&gt;
-&lt;strong&gt;Vendor:&lt;/strong&gt; GNU Project&lt;br&gt;
-&lt;strong&gt;Product:&lt;/strong&gt; GNU Binutils&lt;br&gt;
-&lt;strong&gt;Affected Versions:&lt;/strong&gt; 2.43 (and potentially earlier)&lt;br&gt;
-&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed (commit &lt;code&gt;e0323071916878e0634a6e24d8250e4faff67e88&lt;/code&gt;)&lt;br&gt;
-&lt;strong&gt;Credit:&lt;/strong&gt; 2ourc3&lt;/p&gt;
-&lt;hr&gt;
-&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
-&lt;p&gt;A vulnerability exists in GNU Binutils’ &lt;code&gt;objdump&lt;/code&gt; utility when processing &lt;strong&gt;tekhex&lt;/strong&gt; format files. The issue occurs inside the &lt;strong&gt;Binary File Descriptor (BFD)&lt;/strong&gt; library’s tekhex parser during &lt;strong&gt;format identification&lt;/strong&gt;.&lt;/p&gt;
-&lt;p&gt;In the failing case, the parser attempts to read &lt;strong&gt;8 bytes&lt;/strong&gt; from an address that precedes the global variable &lt;code&gt;_bfd_std_section&lt;/code&gt;, resulting in an &lt;strong&gt;out-of-bounds read&lt;/strong&gt;. This invalid read is reachable with a crafted tekhex file and can be triggered simply by running &lt;code&gt;objdump&lt;/code&gt; on the file.&lt;/p&gt;</description>
+      <guid>https://2ourc3.com/bugs/cve_2024_53589/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;&#xA;&lt;p&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2024-53589&lt;br&gt;&#xA;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;objdump&lt;/code&gt; / BFD &lt;code&gt;tekhex&lt;/code&gt; parser&lt;br&gt;&#xA;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Buffer overflow / out-of-bounds read&lt;br&gt;&#xA;&lt;strong&gt;Vendor:&lt;/strong&gt; GNU Project&lt;br&gt;&#xA;&lt;strong&gt;Product:&lt;/strong&gt; GNU Binutils&lt;br&gt;&#xA;&lt;strong&gt;Affected Versions:&lt;/strong&gt; 2.43 (and potentially earlier)&lt;br&gt;&#xA;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed (commit &lt;code&gt;e0323071916878e0634a6e24d8250e4faff67e88&lt;/code&gt;)&lt;br&gt;&#xA;&lt;strong&gt;Credit:&lt;/strong&gt; 2ourc3&lt;/p&gt;&#xA;&lt;hr&gt;&#xA;&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;&#xA;&lt;p&gt;A vulnerability exists in GNU Binutils’ &lt;code&gt;objdump&lt;/code&gt; utility when processing &lt;strong&gt;tekhex&lt;/strong&gt; format files. The issue occurs inside the &lt;strong&gt;Binary File Descriptor (BFD)&lt;/strong&gt; library’s tekhex parser during &lt;strong&gt;format identification&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;p&gt;In the failing case, the parser attempts to read &lt;strong&gt;8 bytes&lt;/strong&gt; from an address that precedes the global variable &lt;code&gt;_bfd_std_section&lt;/code&gt;, resulting in an &lt;strong&gt;out-of-bounds read&lt;/strong&gt;. This invalid read is reachable with a crafted tekhex file and can be triggered simply by running &lt;code&gt;objdump&lt;/code&gt; on the file.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>
