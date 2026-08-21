@@ -1,0 +1,81 @@
+/* --- black variant ---
+   Must repeat the theme's own :root[data-theme="dark"] specificity,
+   otherwise its rgb(29,30,32) wins over a plain :root rule. */
+:root[data-theme="dark"] {
+    --theme: rgb(0, 0, 0);
+    --entry: rgb(0, 0, 0);
+    --code-block-bg: rgb(18, 18, 20);
+    --code-bg: rgb(18, 18, 20);
+    --border: rgb(38, 38, 38);
+}
+
+/* --- landing page: two flat, one-line-per-entry lists --- */
+.home-header {
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.home-header h1 {
+    font-size: 20px;
+    margin-bottom: 0;
+}
+
+.home-index {
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* two blank lines of breathing room above each section heading */
+.home-index h2 {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 45px 0 8px;   /* 2 blank lines at 14px/1.6 */
+}
+
+.home-list {
+    margin: 0;
+    padding-left: 2px;
+    list-style: none;
+}
+
+/* One entry = exactly one line. Flex rather than plain nowrap so that a long
+   title is the part that truncates: the venue/year and the "Download slides"
+   link stay pinned and visible even on a narrow screen. */
+.home-list li {
+    font-size: 14px;
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    overflow: hidden;
+}
+
+.home-list li::before {
+    content: "\2022";
+    flex: none;
+    margin-right: 8px;
+    color: var(--secondary);
+}
+
+/* the title link: the only part allowed to shrink */
+.home-list li > a {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.home-list li a {
+    box-shadow: none;
+}
+
+.home-list li a:hover {
+    text-decoration: underline;
+}
+
+/* venue / year and "Download slides" suffix on talks */
+.home-meta {
+    flex: none;
+    white-space: nowrap;
+    color: var(--secondary);
+}

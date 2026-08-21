@@ -1,0 +1,17 @@
+# Talks listed on the home page, in the order they appear here (newest first).
+# Each entry renders as one clickable line under the "Talks" heading.
+- title: "Introduction to Fuzzing"
+  venue: "Off By One Security"
+  year: 2026
+  url: "https://www.youtube.com/watch?v=pIrQpvdwxYI"
+
+- title: "Hacking Satellites: From SDR to RCE"
+  venue: "leHACK"
+  year: 2024
+  url: "https://youtu.be/AhtTHXyMz9c"
+
+- title: "Automated Vulnerability Hunting - Where Are We Now"
+  venue: "SANS"
+  year: 2024
+  url: "https://www.sans.org/presentations/automated-vulnerability-hunting-where-are-we-now"
+  slides: "/slides/automated-vulnerability-hunting.pdf"

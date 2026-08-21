@@ -1,6 +1,6 @@
 baseURL: "https://2ourc3.com/"
 title: 2ourc3
-theme: hugo.386
+theme: PaperMod
 languageCode: en
 defaultContentLanguage: en
 
@@ -14,45 +14,69 @@ minify:
   minifyOutput: true
 
 params:
-  # --- Home page ---
-  mainpagetitle: "2ourc3 - Salim LARGO"
-  mainpagedesc: ""
-
-  # Section headings on the home page
-  articlesheading: "Articles"
-  cveheading: "CVE"
-
+  env: production # enables opengraph, twitter-cards and schema
+  title: 2ourc3
   description: "Handcrafted bitflipping machines"
   keywords: [cybersecurity, fuzzing]
   author: "Salim LARGO"
+  DateFormat: "January 2, 2006"
 
-  # Sections listed on the home page, in order
+  # --- black / dark only ---
+  defaultTheme: dark
+  disableThemeToggle: true
+
+  ShowReadingTime: true
+  ShowShareButtons: false
+  ShowPostNavLinks: false
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: false
+  ShowWordCount: true
+  ShowRssButtonInSectionTermList: true
+  UseHugoToc: true
+  disableSpecial1stPost: false
+  disableScrollToTop: false
+  comments: false
+  hidemeta: true
+  hideSummary: false
+  showtoc: false
+  tocopen: false
+
+  # Sections listed on the home page
   mainSections:
     - posts
     - bugs
 
-  # --- Loading animation (BOOTSTRA.386 CRT effect) ---
-  loadfastload: true       # true = skip the boot animation
-  loadspeedfactor: 1.0
-  loadonepass: true
+  # --- Home page ---
+  mainpagetitle: "Handcrafting weird machines"
+  articlesheading: "Articles"
+  cveheading: "CVE"
 
-  showhugo: false
+  assets:
+    favicon: "/icon_rabbit.ico"
 
-  # --- Social links in footer (leave unset to hide) ---
-  github: "https://github.com/2ourc3"
-  twitter: "https://x.com/2ourc3"
+  label:
+    text: "2ourc3"
+    iconHeight: 25
 
-  copyright:
-    name: "Salim LARGO"
-    url: ""
-    prefix: ""
-    suffix: ""
+  profileMode:
+    enabled: false
 
-  # Extra stylesheets/scripts layered on top of the theme
-  customCSS:
-    - css/syntax.css
-    - css/extra.css
-    - css/scheme-win98.css   # colour scheme; remove this line for DOS blue
+  homeInfoParams:
+    Title: "Handcrafted bitflipping machines."
+
+  cover:
+    hidden: true
+    hiddenInList: true
+    hiddenInSingle: true
+
+  # "Contact me" link in the footer
+  contactURL: "https://x.com/2ourc3"
+
+  socialIcons:
+    - name: github
+      url: "https://github.com/2ourc3"
+    - name: x
+      url: "https://x.com/2ourc3"
 
 menu:
   main:

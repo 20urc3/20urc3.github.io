@@ -1,1 +1,3 @@
 User-agent: *
+Disallow:
+Sitemap: https://2ourc3.com/sitemap.xml
