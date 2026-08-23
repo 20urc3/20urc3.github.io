@@ -206,11 +206,175 @@ You can play with this early version of Astra by running the command:  `$ git ch
 
 ### Corpus Collector
 
-The corpus is the collection of initial testcase the user provides to the fuzzer; it is to be transformed into a format that allows the testcase to be mutated. Since the fuzzer goal is to be run in parallel mode, the corpus will be shared by different mechanisms, for that reason we use an atomic reference vector of vector of bytes to represent it `Arc<Vec<Vec<u8>>>`. The `input_dir` entry is added to the CLI and the corpus is collected in the main process. You can check this version at: `eec07ed9b59ec7c89cfaa542c69dd9b631f6836a`
+The corpus is the collection of initial testcase the user provides to the fuzzer; it is to be transformed into a format that allows the testcase to be mutated. Since the fuzzer goal is to be run in parallel mode, the corpus will be shared by different mechanisms, for that reason we use an atomic reference vector of vector of bytes to represent it `Arc<Vec<Vec<u8>>>`. The `input_dir` entry is added to the CLI and the corpus is collected in the main process.
+```rust
+use libc::c_void;
+use rustix::{
+    fs::{Mode, ftruncate},
+    mm::{MapFlags, ProtFlags, mmap},
+    shm,
+};
+use std::ptr::null_mut;
+
+// Shared memory pointer
+static mut SHM_PTR: *mut c_void = std::ptr::null_mut();
+
+// Constant map size for the edge map
+const MAP_SIZE: usize = 262_144;
+
+/// This initiliziation function is *supposedly* ran only once per DSO
+/// It opens the shared memory file only if it exist
+/// Then map it to a global variable SHM_PTR used to write the coverage
+#[unsafe(no_mangle)]
+pub extern "C" fn __sanitizer_cov_trace_pc_guard_init(mut start: *mut u32, stop: *mut u32) -> () {
+    // If not running under the fuzzer (e.g. during ./configure) just NO-OP.
+    let shm_name = match std::env::var("ASTRA_SHM_ID") {
+        Ok(s) => s,
+        Err(_) => return,
+    };
+
+    // Open existing shared memory created by worker
+    let fd = shm::open(&shm_name, shm::OFlags::RDWR, Mode::RUSR | Mode::WUSR).unwrap();
+
+    let ptr: *mut c_void = unsafe {
+        mmap(
+            null_mut(),
+            MAP_SIZE,
+            ProtFlags::READ | ProtFlags::WRITE,
+            MapFlags::SHARED,
+            &fd,
+            0,
+        )
+        .unwrap()
+    };
+
+    ftruncate(&fd, MAP_SIZE as u64).unwrap();
+
+    // Assigning the mmaped `ptr` to SHM_PTR global variable
+    unsafe {
+        SHM_PTR = ptr;
+    }
+
+    // We always start at 1
+    static mut N: u32 = 1;
+    // Assert that the edge map isn't bigger than the shared memory.
+    if (unsafe { stop.offset_from(start) }) > MAP_SIZE.try_into().unwrap() {
+        return;
+    };
+    unsafe {
+        if start == stop || *start != 0 {
+            return;
+        }
+    };
+    while start < stop {
+        unsafe {
+            *start = N;
+            N += 1;
+            start = start.add(1);
+        }
+    }
+}
+
+/// This function is called every time an edge is seen
+/// It tracks edge coverage by assigninga unique ID per edge
+/// and keeps count of the number of time an edge is seen.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn __sanitizer_cov_trace_pc_guard(guard: *mut u32) -> () {
+    // If no shared memory mapped (e.g. ./configure),nm -a binutils/objdump | grep sanitizer just return.
+    if SHM_PTR.is_null() {
+        return;
+    }
+
+    let edge_map: &mut [u8] =
+        unsafe { std::slice::from_raw_parts_mut(SHM_PTR as *mut u8, MAP_SIZE) };
+    let idx = unsafe { (*guard as usize) % MAP_SIZE };
+    edge_map[idx] = edge_map[idx].wrapping_add(1);
+}
+```
 
 ### Observer
 
 The observer part is responsible to determine if an input is interesting or not, as we saw earlier we can simply classify input as interesting by answering the questions: *have we discovered a new edge ? Has the edge hitcount bucket increased ?* A structure `CoverageFlags` holds two boolean values that are used as flags for this mechanism, the corresponding code is in `astra_observer/src/coverage.rs`.  You can check an initial version at: `eec07ed9b59ec7c89cfaa542c69dd9b631f6836a`
+
+```rust
+pub fn copy_map(dest_map: &mut Vec<u8>, src_map: &[u8]) {
+    dest_map
+        .iter_mut()
+        .zip(src_map.iter())
+        .for_each(|(dest, &src)| {
+            *dest = (*dest).max(src);
+        });
+}
+
+pub fn print_map(map: &[u8]) {
+    for (idx, &edge_count) in map.iter().enumerate() {
+        if edge_count != 0 {
+            println!("map[{}] = {}", idx, edge_count);
+        }
+    }
+}
+
+// AFL-style bucket lookup table
+pub fn bucketize(hit_count: u8) -> u8 {
+    const BUCKETS: [u8; 256] = [
+        0, 1, 2, 3, 4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 8, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,
+        16, 16, 16, 16, 16, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32,
+        32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 32, 128,
+    ];
+    BUCKETS[hit_count as usize]
+}
+
+pub struct CoverageFlags {
+    pub new_edge: bool,
+    pub new_hit: bool,
+}
+
+/// Compare two maps and returns flag i
+/// if the next map is different than the previous one
+pub fn compare_maps(previous_map: &Vec<u8>, new_map: &Vec<u8>) -> CoverageFlags {
+    let mut flags = CoverageFlags {
+        new_edge: false,
+        new_hit: false,
+    };
+
+    for (idx, &prev_hit) in previous_map.iter().enumerate() {
+        let new_hit = new_map[idx];
+
+        if prev_hit == 0 && new_hit > 0 {
+            flags.new_edge = true;
+        }
+
+        let prev_bucket = bucketize(prev_hit);
+        let next_bucket = bucketize(new_hit);
+
+        if prev_bucket < next_bucket {
+            flags.new_hit = true;
+        }
+
+        if flags.new_edge && flags.new_hit {
+            break;
+        }
+    }
+
+    flags
+}
+
+pub fn count_raw_edges(map: &[u8]) -> usize {
+    map.iter().filter(|&&x| x > 0).count()
+}
+
+pub fn total_raw_hits(map: &[u8]) -> usize {
+    map.iter().map(|&x| x as usize).sum()
+}
+```
 
 ### Worker
 
@@ -220,15 +384,239 @@ Parallelism can be described as a method to execute multiple tasks at the same t
 
 Thankfully Rust offers more modern, fast and reliable mechanisms to do that. In Astra we will use the crate `crossbeam` and its channel to create a priority list of inputs that yielded interesting results in a previous run, a normal list of inputs collected from the corpus, a global map owned only by the main thread. Channels are used to pass data without having to share them amongst threads, which not only scales well but also prevents a lot of overhead from locks. You can check an initial version of `astra_worker/lib.rs` and `astra_worker/worker.rs` at this checkout: `ea65117f70123e325af9d1ac075e341de24f32cd`
 
+```rust
+//! This file provides function to spawn a worker.
+//! A worker is thread that spawn the target program as a child-process
+//!
+//! Its arguments are:
+//! - thread id
+//! - A input to process
+//! - A path to the target program
+//!
+//! - It establish a unique shared memory between the thread
+//! and the child-process, used to share the edge_map
+//! - It returns input and new edge-map to the main process
+
+use astra_monitor::*;
+use astra_mutator::*;
+use astra_observer::shm::*;
+use astra_scheduler::*;
+use astra_tui::log_info;
+
+use chrono;
+use colored_text::Colorize;
+use flume::{Receiver, Sender};
+use std::os::unix::process::ExitStatusExt;
+use std::path::PathBuf;
+use std::process::{Command, Stdio};
+use wait_timeout::ChildExt;
+
+const MAP_SIZE: usize = 262_144;
+
+pub fn worker(
+    id: u16,
+    target: PathBuf,
+    timeout: u64,
+    args_before: Vec<String>,
+    args_after: Vec<String>,
+    corpus: InputQueue,
+    send_cov: Sender<(u16, Vec<u8>, Vec<u8>)>,
+    send_crash: Sender<bool>,
+    send_hang: Sender<bool>,
+) {
+    // Initialize findings/hangs holder and shared memory
+    let mut finding = false;
+    let mut hang = false;
+    log_info!("Astra-worker", "The worker {id} has started");
+    let timeout_ms = std::time::Duration::from_millis(timeout);
+    let mut local_map = vec![0u8; MAP_SIZE];
+    let (_, ptr, shm_id) = create_shared_memory(id);
+    let edge_map = unsafe { std::slice::from_raw_parts_mut(ptr as *mut u8, MAP_SIZE) };
+
+    loop {
+        let Some(mut input) = corpus.get_next() else {
+            std::thread::sleep(std::time::Duration::from_millis(10));
+            continue;
+        };
+
+        random_havoc(&mut input);
+        edge_map.fill(0);
+
+        let tmp = std::env::temp_dir().join(format!("input_{id}.tmp"));
+        std::fs::write(&tmp, &input).unwrap();
+        let mut cmd_args = args_before.clone();
+        cmd_args.push(tmp.to_string_lossy().to_string());
+        cmd_args.extend(args_after.clone());
+
+        let mut child = Command::new(&target)
+            .args(&cmd_args)
+            .env("ASTRA_SHM_ID", &shm_id)
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn()
+            .expect("Failed to run the target");
+
+        match child.wait_timeout(timeout_ms).unwrap() {
+            Some(status) => match status.signal() {
+                Some(0) => {}
+                Some(11) => {
+                    record_crash(input.clone());
+                    finding = true;
+                    let _ = send_crash.send(finding);
+                }
+                _ => {}
+            },
+
+            None => {
+                child.kill().unwrap();
+                hang = true;
+                let _ = send_hang.send(hang);
+                child.wait().unwrap();
+            }
+        };
+
+        let local_copy = edge_map.to_vec();
+        send_cov.send((id, input, local_copy)).unwrap();
+    }
+}
+```
+
 ### Mutation Engine
 
 Feeding inputs to a target is great but it’s important that the fuzzer mutates them in order to discover new edges. There are plenty of different kinds of mutations, on bits level, bytes level, or even segments. Some of them are inserting, replacing, swapping, deleting from the mutated input. More advanced mechanics exist such as splicing or even text normalization. Other mutators operate on highly structured input such as grammar mutator, which allows to produce syntactically correct inputs.
 
 A good first start is to implement simple havoc mutation that will operate on one or multiple bytes, using AFL and LibAFL as inspiration. You can check the mutation engine at `astra_mutator/havoc_mutations` at this checkout: `233a5e3038da98c0127d544a1dc71463a8d344cf`. By running the fuzzer with a simple input containing the letter `b` it is now able to find all the branches of the small test program. 
 
+```rust
+//! This file provide havoc mutation in an AFL style
+//!
+//! The function tkaes 3 arguments:
+//! - An input which is a vector of bytes
+//! - The length of the input to avoid redundant computation
+//! - The number of mutations
+
+use rand::Rng;
+
+/// Type alias for the function pointer signature
+pub type MutatorFunction = fn(&mut Vec<u8>);
+
+/// Flips a random bit in a random byte
+pub fn bit_flip(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    let mut rng = rand::rng();
+    let byte_index = rng.random_range(0..length - 1) as usize;
+    let bit_index = rng.random_range(0..8) as usize;
+    input[byte_index] ^= 1 << bit_index;
+}
+
+/// Flips a random byte with another random byte
+pub fn bytes_swap(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    let mut rng = rand::rng();
+    let previous_byte = rng.random_range(0..length - 1) as usize;
+    let next_byte = rng.random_range(0..length - 1) as usize;
+    input.swap(previous_byte, next_byte);
+}
+
+/// Inserts a random byte at random index
+pub fn bytes_insert(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    let mut rng = rand::rng();
+    let byte_index = rng.random_range(0..length - 1) as usize;
+    let random_byte: u8 = rng.random_range(0..=255);
+    input.insert(byte_index, random_byte);
+}
+
+/// Deletes a random byte at a random index
+/// To avoid producing too small test cases, the function check if the length is
+/// superior to 23 bytes (arbitrary value)
+pub fn bytes_delete(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    if length > 23 {
+        let mut rng = rand::rng();
+        let byte_index = rng.random_range(0..length - 1) as usize;
+        input.remove(byte_index);
+    }
+}
+
+/// Increase a random byte at random index
+pub fn bytes_inc(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    let mut rng = rand::rng();
+    let byte_index = rng.random_range(0..length - 1) as usize;
+    input[byte_index] = input[byte_index].wrapping_add(1); // This allows to overflow if 255
+}
+
+/// Decrement a random byte at random index
+pub fn bytes_dec(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    let mut rng = rand::rng();
+    let byte_index = rng.random_range(0..length - 1) as usize;
+    input[byte_index] = input[byte_index].wrapping_sub(1); // This allows to underflow if 0
+}
+
+/// Negates a random byte at a random index
+pub fn bytes_neg(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    let mut rng = rand::rng();
+    let byte_index = rng.random_range(0..length - 1) as usize;
+    input[byte_index] = input[byte_index].wrapping_neg();
+}
+
+/// Randomized the value of a random byte at random index
+pub fn bytes_rand(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    let mut rng = rand::rng();
+    let byte_index = rng.random_range(0..length - 1) as usize;
+    input[byte_index] = rng.random_range(0..=255) as u8;
+}
+
+/// Copy a random byte at random index and insert it right after
+pub fn bytes_copy(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    let mut rng = rand::rng();
+    let byte_index = rng.random_range(0..length - 1) as usize;
+    let byte_copy = input[byte_index];
+    input.insert(byte_index + 1, byte_copy);
+}
+
+/// Expand the input by a random byte for a number of mutations passed
+pub fn bytes_expand(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    if length < 10_000_000 {
+        let mut rng = rand::rng();
+        let random_byte = rng.random_range(0..=255) as u8;
+        input.push(random_byte);
+    }
+}
+
+/// Shrinks the input by a byte
+pub fn byte_shrink(input: &mut Vec<u8>) {
+    let length = input.len() as u32;
+    if length > 23 {
+        input.pop();
+    }
+}
+```
+
 ### Monitor
 
 This component collects termination signals of the program under test, we can simply observe the child process exit code, if the signal is not `0` this means some problem occurred. The fuzzer then saves the file with a unique hash based on the file content in the `output/crashes/` folder.   You can check the monitoring at `astra_monitor/lib.rs` at this checkout: `b33c868b8b7814b398171f332cd25dc866d3f08f`.
+
+```rust
+use std::fs;
+use std::hash::Hash;
+use std::io::prelude::*;
+
+/// Saves crashing unique input to a crash folder
+pub fn record_crash(input: Vec<u8>) {
+    fs::create_dir_all("./output/crashes").unwrap();
+    let unique_hash = sha256::digest(&input);
+    let filename = format!("./output/crashes/crash_{}", unique_hash);
+    let mut file = fs::File::create(filename).unwrap();
+    file.write_all(&input).unwrap();
+}
+```
 
 ### Statistics
 
@@ -243,6 +631,181 @@ Astra isn’t super original, a good starting will be to cover these essentials 
 
 You can checkout the commit `8fb92493de6af1c55970bc4d7504a43916a83691` and look at the code at `astra_tui/lib.rs` and `astra_worker/lib.rs` / `astra_worker/worker.rs` if you are curious to see this initial implementation. 
 
+```rust
+pub mod worker;
+
+use worker::*;
+
+use astra_collector::collect_corpus;
+use astra_observer::coverage::*;
+use astra_scheduler::*;
+use astra_tui::*;
+
+const MAP_SIZE: usize = 262_144;
+
+use chrono;
+use colored_text::Colorize;
+use flume::unbounded;
+use std::sync::atomic::Ordering;
+use std::{path::PathBuf, thread};
+
+/// Creates and run the worker pool
+pub fn running_workers(
+    num_thr: u16,
+    input_dir: PathBuf,
+    timeout: u64,
+    target: PathBuf,
+    arguments: Vec<String>,
+) {
+    let (send_cov, recv_cov) = unbounded::<(u16, Vec<u8>, Vec<u8>)>();
+    let (send_crash, recv_crash) = unbounded::<bool>();
+    let (send_hang, recv_hang) = unbounded::<bool>();
+
+    // Initial the corpus queues with user seeds
+    let mut initial_corpus = collect_corpus(&input_dir);
+    assert!(!initial_corpus.is_empty());
+    let corpus = InputQueue::new();
+    for input in initial_corpus {
+        corpus.add_normal(input);
+    }
+
+    // Prepare map and statistics
+    let mut global_map = vec![0u8; MAP_SIZE];
+    let fuzz_stats = FuzzingStats::new();
+    let start_time_instant = std::time::Instant::now();
+    let mut last_print_time = std::time::Instant::now();
+    let mut last_time_new_path = std::time::Instant::now();
+
+    let (args_before, args_after): (Vec<String>, Vec<String>) = {
+        if let Some(pos) = arguments.iter().position(|arg| arg == "@@") {
+            (arguments[..pos].to_vec(), arguments[pos + 1..].to_vec())
+        } else {
+            (arguments.clone(), Vec::new())
+        }
+    };
+
+    // Spawn the threads
+    let mut worker_handles = Vec::new();
+    for id in 0..num_thr {
+        let corpus = corpus.clone();
+        let send_cov = send_cov.clone();
+        let send_crash = send_crash.clone();
+        let send_hang = send_hang.clone();
+        let target = target.clone();
+        let args_before = args_before.clone();
+        let args_after = args_after.clone();
+
+        worker_handles.push(thread::spawn(move || {
+            worker(
+                id,
+                target,
+                timeout,
+                args_before,
+                args_after,
+                corpus,
+                send_cov,
+                send_crash,
+                send_hang,
+            )
+        }));
+    }
+
+    loop {
+        while let Ok((_, input, child_map)) = recv_cov.try_recv() {
+            let flags = compare_maps(&mut global_map, &child_map);
+
+            if flags.new_edge || flags.new_hit {
+                corpus.add_priority(input);
+                fuzz_stats.tot_path.fetch_add(1, Ordering::Relaxed);
+                last_time_new_path = std::time::Instant::now();
+            } else {
+                corpus.add_normal(input);
+            }
+
+            copy_map(&mut global_map, &child_map);
+            fuzz_stats.tot_execution.fetch_add(1, Ordering::Relaxed);
+
+            let elapsed_secs = start_time_instant.elapsed().as_secs();
+            fuzz_stats.run_time.store(elapsed_secs, Ordering::Relaxed);
+
+            let tot_exec = fuzz_stats.tot_execution.load(Ordering::Relaxed);
+            let exec_speed = if elapsed_secs > 0 {
+                tot_exec / elapsed_secs
+            } else {
+                0
+            };
+            fuzz_stats.exec_speed.store(exec_speed, Ordering::Relaxed);
+
+            let t_since_last = last_time_new_path.elapsed().as_secs();
+            fuzz_stats
+                .t_since_last_path
+                .store(t_since_last, Ordering::Relaxed);
+
+            fuzz_stats
+                .raw_edges
+                .store(count_raw_edges(&global_map), Ordering::Relaxed);
+            fuzz_stats
+                .raw_hits
+                .store(total_raw_hits(&global_map), Ordering::Relaxed);
+        }
+
+        while let Ok(_) = recv_crash.try_recv() {
+            fuzz_stats.tot_crash.fetch_add(1, Ordering::Relaxed);
+        }
+
+        while let Ok(_) = recv_hang.try_recv() {
+            fuzz_stats.tot_tmout.fetch_add(1, Ordering::Relaxed);
+        }
+
+        if last_print_time.elapsed() >= std::time::Duration::new(1, 0) {
+            let runtime = fuzz_stats
+                .run_time
+                .load(std::sync::atomic::Ordering::Relaxed);
+            let t_since_last_path = fuzz_stats
+                .t_since_last_path
+                .load(std::sync::atomic::Ordering::Relaxed);
+            let tot_path = fuzz_stats
+                .tot_path
+                .load(std::sync::atomic::Ordering::Relaxed);
+            let raw_edges = fuzz_stats
+                .raw_edges
+                .load(std::sync::atomic::Ordering::Relaxed);
+            let raw_hits = fuzz_stats
+                .raw_hits
+                .load(std::sync::atomic::Ordering::Relaxed);
+            let tot_crash = fuzz_stats
+                .tot_crash
+                .load(std::sync::atomic::Ordering::Relaxed);
+            let tot_tmout = fuzz_stats
+                .tot_tmout
+                .load(std::sync::atomic::Ordering::Relaxed);
+            let tot_execution = fuzz_stats
+                .tot_execution
+                .load(std::sync::atomic::Ordering::Relaxed);
+            let exec_speed = fuzz_stats
+                .exec_speed
+                .load(std::sync::atomic::Ordering::Relaxed);
+
+            log_info!(
+                "Astra-worker",
+                "runtime: {} secs | time since last find: {} | total findings: {} | tot edges/hit: {}/{} | crash/timeout: {}/{}  | total exec: {} | exec/sec: {}",
+                runtime,
+                t_since_last_path,
+                tot_path,
+                raw_edges,
+                raw_hits,
+                tot_crash,
+                tot_tmout,
+                tot_execution,
+                exec_speed
+            );
+
+            last_print_time = std::time::Instant::now();
+        }
+    }
+}
+```
+
 ### Installer
 
 In a real-world scenario the user will desire to use the fuzzer against existing software that probably uses compiling systems such as Makefile, Just, Ninja, and so on. For this purpose it’s very convenient to have the static library `libastra_sancov.a` on the user’s system. 
@@ -251,20 +814,165 @@ The first step is to actually distribute Astra and its components properly to th
 
 It is now possible to instrument any target with the following command: `CC=clang CFLAGS=” -fsanitize-coverage=trace-pc-guard -fsanitize=address” LD=clang LDFLAGS=”-lastra_sancov -fsanitize=address`. 
 
+```bash
+#!/bin/bash
+
+# If no argument is provided, run cargo build and call this script again
+if [ -z "$1" ]; then
+    echo "Building project in release mode..."
+    cargo build --release || { echo "Build failed"; exit 1; }
+
+    # Find libsancov.a
+    LIB_PATH=$(find target/release -name "libastra_sancov.a" | head -n 1)
+
+    if [ -z "$LIB_PATH" ]; then
+        echo "libsancov.a not found"
+        exit 1
+    fi
+
+    echo "Re-running installer with library path: $LIB_PATH"
+    exec "$0" "$LIB_PATH"
+fi
+
+# installer logic
+LIBRARY_PATH=$1
+
+# Detect OS
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    INSTALL_PATH="/usr/local/lib"
+    echo "macOS detected, installing to $INSTALL_PATH"
+elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+    INSTALL_PATH="/usr/lib"
+    echo "Linux detected, installing to $INSTALL_PATH"
+else
+    echo "Unsupported OS"
+    exit 1
+fi
+
+# Copy the library
+sudo cp "$LIBRARY_PATH" "$INSTALL_PATH" && echo "Library installed successfully!" || {
+    echo "Failed to install library"
+    exit 1
+}
+
+# refreshing ldconfig
+sudo ldconfig || {
+    echo "Failed to refresh LDCONFIG"
+    exit1
+}
+
+# Install binaries
+cargo install --path crates/astra_fuzz || {
+    echo "Failed to install astra binary"
+    exit 1
+}
+
+cargo install --path crates/astra_cc || {
+    echo "Failed to install astra_cc"
+    exit1
+}
+
+cargo install --path crates/astra_cxx || {
+    echo "Failed to install astra_cxx"
+    exit1
+}
+
+echo "Astra and dependencies are installed successfully!"
+```
 ### Making a `cc` and `cxx` wrapper
 
 AFL and others offer a compiler wrapper so that users don't have to pass flags themself, this is exactly what astra do too. It ships with two compilers `astra_cc` and `astra_cxx` that can be used with building scripts such as `Makefile` and others. You can check these wrappers at this commit: `dc52a1c01d326074e27cf81df195d724ff42238a` in these files: `astra_cc/src/lib.rs` and `astra_cxx/src/lib.rs`. **Note**: We do not need a linker in the fuzzer anymore since linking now happens at compile time.
 
 To test these wrappers I used `astra_cc` against the tool [htmldoc](https://github.com/michaelrsweet/htmldoc) with: `CC=astra_cc CXX=astra_cc LD=astra_cc ./configure && make -j(nproc)` and run Astra against an instrumented version of `htmldoc`.
 
+```rust
+use std::env;
+use std::process::{Command, exit};
+
+fn main() {
+    let mut args: Vec<String> = env::args().skip(1).collect();
+    let is_compilation = args.contains(&"-c".to_string());
+
+    if is_compilation {
+        args.push("-fsanitize-coverage=trace-pc-guard".into());
+        args.push("-fsanitize=address".into());
+    } else {
+        args.push("-fsanitize-coverage=trace-pc-guard".into());
+        args.push("-fsanitize=address".into());
+        args.push("-Wl,--whole-archive,--allow-multiple-definition".into());
+        args.push("/usr/lib/libastra_sancov.a".into());
+        args.push("-Wl,--no-whole-archive".into());
+    }
+
+    let status = Command::new("clang-20")
+        .args(args)
+        .status()
+        .expect("failed to compile!");
+
+    exit(status.code().unwrap_or(1));
+}
+```
+
+The fuzzer is now good enough for a first run! 
+
 ![](image1.png)  
 
- We are now fuzzing an instrument binary with our own custom coverage!
+ We are now fuzzing an instrument binary with **our own custom coverage!** hoora!
 
 ### Accepting trailing arguments and improving the CLI
 
 AFL doesn’t specify arguments itself, it receives it from the user and injects the filename at the position the user specified `@@`. For this reason we are going to implement a way to catch trailing arguments, read arguments after `--`, and inject the filename accordingly. It’s also a good time to improve the CLI more generally.  
 Clap offers a good way to catch trailing arguments, basically anything that is after `--` will be stored in a `Vec<String>`, we can then simply iterate over the vector, catch the `@@` symbol and inject the filename at the right place. A simple version can be found in the file `astra/src/main.rs` and `astra_cli/src/lib.rs` at this checkout: `dc52a1c01d326074e27cf81df195d724ff42238a`. 
+
+```rust
+use clap::Parser;
+use std::path::PathBuf;
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about, trailing_var_arg = true)]
+pub struct Args {
+    #[arg(
+        short = 'i',
+        long = "input",
+        help = "Specify the input folder path containing initial testcases."
+    )]
+    pub input_folder: PathBuf,
+
+    #[arg(
+        short = 'o',
+        long = "output",
+        default_value = "output",
+        help = "Specify the output folder where crashing or hanging inputs are saved."
+    )]
+    pub output_folder: PathBuf,
+
+    #[arg(
+        short = 't',
+        long = "timeout",
+        default_value = "5000",
+        help = "Specify the number of ms before considering the target program has timeout."
+    )]
+    pub timeout: u64,
+
+    #[arg(
+        short = 'c',
+        long = "cores",
+        default_value = "4",
+        help = "Specify the number of core used for parallel fuzzing."
+    )]
+    pub cores: u16,
+
+    #[arg(short = 'p', long = "program", help = "Specify the program to fuzz.")]
+    pub program: PathBuf,
+
+    #[arg(
+        trailing_var_arg = true,
+        allow_hyphen_values = true,
+        help = "Specify the arguments passed to the target program."
+    )]
+    pub arguments: Vec<String>,
+}
+```
 
 ### Catching timeouts
 
@@ -274,7 +982,11 @@ Writing a timeout catcher can be complex because we have to deal with signal han
 
 ![](image2.png)
 
-You can find an example at `astra_worker/src/worker.rs` at this checkout: `9c05b4f5ef2e3adfba21d094ee347f92a7a5645f` **Note:** the timeout is defaulted to 10ms in the CLI in this example! Voila! Astra is now essentially a rudimentary but complete fuzzer! Hourra!
+You can find an example at `astra_worker/src/worker.rs` at this checkout: `9c05b4f5ef2e3adfba21d094ee347f92a7a5645f` 
+
+>**Note:** the timeout is defaulted to 10ms in the CLI in this example.
+
+Voila! Astra is now essentially a rudimentary but complete fuzzer!
 
 ## Conclusion
 
