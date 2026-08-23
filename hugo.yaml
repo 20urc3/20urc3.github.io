@@ -38,7 +38,7 @@ params:
   comments: false
   hidemeta: true
   hideSummary: false
-  showtoc: false
+  showtoc: true
   tocopen: false
 
   # Sections listed on the home page

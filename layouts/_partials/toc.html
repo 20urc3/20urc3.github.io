@@ -1,0 +1,112 @@
+{{- /* Left-hand navigation pane listing the article's headings.
+
+   Built by hand rather than from .TableOfContents because heading levels are
+   inconsistent across posts (astra jumps between h1 and h2) and one post has an
+   empty "## " heading. We collect h1-h3, drop the empty ones, then indent each
+   entry relative to the shallowest level actually present, so every article
+   gets a flat, evenly-indented list regardless of which levels it used.
+
+   Entries are numbered 1., 1.a, 1.a.1 by that same relative depth. */ -}}
+
+{{- $headers := findRE "<h[1-3][^>]*?>(.|\n)+?</h[1-3]>" .Content -}}
+
+{{- /* (id, level, text) triples, empty headings discarded */ -}}
+{{- $items := slice -}}
+{{- range $headers -}}
+  {{- $level := int (index (findRE "[1-3]" . 1) 0) -}}
+  {{- $ids := findRE "id=\"[^\"]+\"" . 1 -}}
+  {{- $text := trim (plainify (replaceRE "<h[1-3][^>]*?>((.|\n)+?)</h[1-3]>" "$1" .)) " \n\t" -}}
+  {{- if and $text $ids -}}
+    {{- $id := replaceRE "(id=\"|\")" "" (index $ids 0) -}}
+    {{- $items = $items | append (dict "id" $id "level" $level "text" $text) -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if ge (len $items) 2 -}}
+{{- $min := 3 -}}
+{{- range $items }}{{ if lt .level $min }}{{ $min = .level }}{{ end }}{{ end -}}
+
+{{- $letters := split "abcdefghijklmnopqrstuvwxyz" "" -}}
+{{- $n0 := 0 -}}{{- $n1 := 0 -}}{{- $n2 := 0 -}}
+
+<nav class="toc-sidebar" aria-label="{{ i18n "toc" | default "Table of Contents" }}">
+  <p class="toc-title">{{ i18n "toc" | default "Table of Contents" }}</p>
+  <ul>
+    {{- range $items }}
+    {{- $d := sub .level $min }}
+
+    {{- /* a sub-heading appearing before any top-level one still belongs to a
+           section, so open section 1 rather than numbering it 0.a */ -}}
+    {{- if and (gt $d 0) (eq $n0 0) }}{{ $n0 = 1 }}{{ end }}
+
+    {{- $label := "" }}
+    {{- if eq $d 0 }}
+      {{- $n0 = add $n0 1 }}{{ $n1 = 0 }}{{ $n2 = 0 }}
+      {{- $label = printf "%d." $n0 }}
+    {{- else }}
+      {{- if eq $d 1 }}{{ $n1 = add $n1 1 }}{{ $n2 = 0 }}{{ end }}
+      {{- /* past 26 sub-sections there are no letters left, so fall back to a number */ -}}
+      {{- $sub := string $n1 }}
+      {{- if and (ge $n1 1) (le $n1 26) }}{{ $sub = index $letters (sub $n1 1) }}{{ end }}
+      {{- if eq $d 1 }}
+        {{- $label = printf "%d.%s" $n0 $sub }}
+      {{- else }}
+        {{- $n2 = add $n2 1 }}
+        {{- $label = printf "%d.%s.%d" $n0 $sub $n2 }}
+      {{- end }}
+    {{- end }}
+
+    <li class="toc-depth-{{ $d }}">
+      <a href="#{{ .id }}" aria-label="{{ .text }}"><span class="toc-num">{{ $label }}</span><span class="toc-text">{{ .text }}</span></a>
+    </li>
+    {{- end }}
+  </ul>
+</nav>
+
+<script>
+(function () {
+  var pane = document.querySelector('.toc-sidebar');
+  if (!pane) return;
+
+  var links = Array.prototype.slice.call(pane.querySelectorAll('a[href^="#"]'));
+
+  /* Scroll spy: highlight the heading the reader is currently under.
+     This partial renders above the article, so the headings do not exist yet
+     at parse time - wait for the document before looking them up. */
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initSpy);
+  } else {
+    initSpy();
+  }
+
+  function initSpy() {
+    var targets = links
+      .map(function (a) { return document.getElementById(decodeURIComponent(a.hash.slice(1))); })
+      .filter(Boolean);
+    if (!targets.length) return;
+
+    var current = null;
+    function highlight() {
+      /* the last heading whose top has passed a line a third down the viewport */
+      var line = window.innerHeight / 3;
+      var found = targets[0];
+      for (var i = 0; i < targets.length; i++) {
+        if (targets[i].getBoundingClientRect().top <= line) found = targets[i];
+        else break;
+      }
+      if (found === current) return;
+      current = found;
+      links.forEach(function (a) {
+        a.classList.toggle('active', decodeURIComponent(a.hash.slice(1)) === found.id);
+      });
+    }
+
+    /* Browsers already coalesce scroll events to one per frame and highlight()
+       only reads a handful of rects, so no extra throttling is needed. */
+    window.addEventListener('scroll', highlight, { passive: true });
+    window.addEventListener('resize', highlight, { passive: true });
+    highlight();
+  }
+})();
+</script>
+{{- end -}}

@@ -79,3 +79,116 @@
     white-space: nowrap;
     color: var(--secondary);
 }
+
+/* --- article navigation pane -------------------------------------------
+   Wide viewports: the table of contents sits in the left gutter, fixed, and
+   tracks the reader's position. Below the breakpoint there is no room beside
+   the 768px content column, so it sits above the article as a plain block. */
+
+.toc-sidebar {
+    margin-bottom: var(--content-gap);
+    padding: 0.6rem 1.2rem 0.8rem;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+[data-theme="dark"] .toc-sidebar {
+    background: var(--entry);
+}
+
+.toc-sidebar .toc-title {
+    margin: 0 0 0.4rem;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--secondary);
+}
+
+.toc-sidebar ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.toc-sidebar li {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.toc-sidebar li a {
+    display: flex;
+    gap: 8px;
+    padding: 3px 0 3px 10px;
+    border-left: 2px solid var(--border);
+    color: var(--secondary);
+    box-shadow: none;
+    text-decoration: none;
+}
+
+.toc-sidebar li a:hover {
+    color: var(--primary);
+    border-left-color: var(--secondary);
+    text-decoration: none;
+}
+
+/* current section, set by the scroll spy */
+.toc-sidebar li a.active {
+    color: var(--primary);
+    border-left-color: var(--primary);
+}
+
+/* the 1. / 1.a / 1.a.1 marker: its own column so wrapped titles stay aligned */
+.toc-sidebar .toc-num {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.7;
+}
+
+.toc-sidebar .toc-depth-1 a { padding-left: 22px; }
+.toc-sidebar .toc-depth-2 a { padding-left: 34px; font-size: 13px; }
+
+@media screen and (min-width: 1280px) {
+    /* content column is centred and 768px wide incl. gaps; park the pane in
+       the gutter to its left, 28px clear of it */
+    .toc-sidebar {
+        position: fixed;
+        top: 100px;
+        left: calc(50% - (var(--main-width) / 2) - var(--gap) - 28px - 220px);
+        width: 220px;
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        z-index: 10;
+        /* no card treatment out in the margin - it should read as marginalia */
+        margin-bottom: 0;
+        padding: 0;
+        background: none;
+        border: none;
+        /* the pane scrolls on long articles; keep its bar out of the way */
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+    }
+
+    [data-theme="dark"] .toc-sidebar {
+        background: none;
+    }
+
+    .toc-sidebar .toc-title {
+        padding-left: 12px;
+    }
+
+    .toc-sidebar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .toc-sidebar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .toc-sidebar::-webkit-scrollbar-thumb {
+        background: var(--border);
+        border-radius: 3px;
+    }
+}

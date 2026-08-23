@@ -97,8 +97,6 @@ After reading the AFL technical specification, it appears that AFL is an out-of-
 
 Of course, dozens of other fuzzers exist and each have their own specificity, however, AFL laid out the way for modern fuzzers and we can find similar features in a lot of recent projects. A great way to learn more is to read the code of other state-of-the-art fuzzer such as [AFL++](https://github.com/AFLplusplus/AFLplusplus), [LibAFL](https://github.com/AFLplusplus/LibAFL), [cargo-fuzz](https://github.com/rust-fuzz/cargo-fuzz), etc. 
 
-## 
-
 ## Designing a fuzzer architecture: Astra.
 
 The main goal of Astra is to provide a **simple** to use and **reliable** fuzzer. For these reasons, and because it is objectively the best language in the world, this fuzzer will be written in Rust. It should be able to run on any UNIX distribution that supports Rust, provide a clear interface to the user and produce interesting results. The design is greatly inspired from AFL but for different reasons some choices differ from the old AFL version.
@@ -157,7 +155,7 @@ To test the fuzzer during the development phase, I created several test programs
 - A [reader](https://github.com/20urc3/Astra/blob/main/PUTs/reader.c) that reads a file from inputs and performs a few actions if some characters are detected.  
 - A [parser](https://github.com/20urc3/Astra/blob/main/PUTs/parser.c) that reads and parses data from a file input. 
 
-# Instrumentation Engine 
+### Instrumentation Engine
 
 Astra needs to collect code-coverage on Linux, Windows and MacOS, thankfully clang offers code-coverage instrumentation and is available on all of these platforms. The setup is somehow trivial, we simply need clang and some LLVM tools that you can install by following their [getting started guide](https://llvm.org/docs/GettingStarted.html). It offers multiple coverage instrumentation methods, like [source-code coverage](https://clang.llvm.org/docs/SourceBasedCodeCoverage.html) or a [gcov](https://gcc.gnu.org/onlinedocs/gcc/Gcov.html) compatible instrumentation. The interesting one is `edge-coverage` because it offers a very granular coverage metric, this feature is provided by [SanCov](https://clang.llvm.org/docs/SanitizerCoverage.html).  
 
@@ -206,15 +204,15 @@ To determine if an input is interesting, the edge map obtained by a process is c
 
 You can play with this early version of Astra by running the command:  `$ git checkout 1b38cb98f7901e7857f673c739b6cc1f4ec4251`then run the project against a binary instrumented with `trace-pc-guard`.  
 
-# Corpus Collector
+### Corpus Collector
 
 The corpus is the collection of initial testcase the user provides to the fuzzer; it is to be transformed into a format that allows the testcase to be mutated. Since the fuzzer goal is to be run in parallel mode, the corpus will be shared by different mechanisms, for that reason we use an atomic reference vector of vector of bytes to represent it `Arc<Vec<Vec<u8>>>`. The `input_dir` entry is added to the CLI and the corpus is collected in the main process. You can check this version at: `eec07ed9b59ec7c89cfaa542c69dd9b631f6836a`
 
-# Observer
+### Observer
 
 The observer part is responsible to determine if an input is interesting or not, as we saw earlier we can simply classify input as interesting by answering the questions: *have we discovered a new edge ? Has the edge hitcount bucket increased ?* A structure `CoverageFlags` holds two boolean values that are used as flags for this mechanism, the corresponding code is in `astra_observer/src/coverage.rs`.  You can check an initial version at: `eec07ed9b59ec7c89cfaa542c69dd9b631f6836a`
 
-# Worker
+### Worker
 
 The worker is the heart of the fuzzer, based on the number of CPU cores the user provides, the fuzzer will spawn the corresponding number of thread workers, each one mission is to feed a testcase from the corpus or the queue to the target, observe and report the result. 
 
@@ -222,17 +220,17 @@ Parallelism can be described as a method to execute multiple tasks at the same t
 
 Thankfully Rust offers more modern, fast and reliable mechanisms to do that. In Astra we will use the crate `crossbeam` and its channel to create a priority list of inputs that yielded interesting results in a previous run, a normal list of inputs collected from the corpus, a global map owned only by the main thread. Channels are used to pass data without having to share them amongst threads, which not only scales well but also prevents a lot of overhead from locks. You can check an initial version of `astra_worker/lib.rs` and `astra_worker/worker.rs` at this checkout: `ea65117f70123e325af9d1ac075e341de24f32cd`
 
-# Mutation Engine
+### Mutation Engine
 
 Feeding inputs to a target is great but it’s important that the fuzzer mutates them in order to discover new edges. There are plenty of different kinds of mutations, on bits level, bytes level, or even segments. Some of them are inserting, replacing, swapping, deleting from the mutated input. More advanced mechanics exist such as splicing or even text normalization. Other mutators operate on highly structured input such as grammar mutator, which allows to produce syntactically correct inputs.
 
 A good first start is to implement simple havoc mutation that will operate on one or multiple bytes, using AFL and LibAFL as inspiration. You can check the mutation engine at `astra_mutator/havoc_mutations` at this checkout: `233a5e3038da98c0127d544a1dc71463a8d344cf`. By running the fuzzer with a simple input containing the letter `b` it is now able to find all the branches of the small test program. 
 
-# Monitor
+### Monitor
 
 This component collects termination signals of the program under test, we can simply observe the child process exit code, if the signal is not `0` this means some problem occurred. The fuzzer then saves the file with a unique hash based on the file content in the `output/crashes/` folder.   You can check the monitoring at `astra_monitor/lib.rs` at this checkout: `b33c868b8b7814b398171f332cd25dc866d3f08f`.
 
-# Statistics
+### Statistics
 
 Astra isn’t super original, a good starting will be to cover these essentials metrics:
 
@@ -245,7 +243,7 @@ Astra isn’t super original, a good starting will be to cover these essentials 
 
 You can checkout the commit `8fb92493de6af1c55970bc4d7504a43916a83691` and look at the code at `astra_tui/lib.rs` and `astra_worker/lib.rs` / `astra_worker/worker.rs` if you are curious to see this initial implementation. 
 
-# Installer 
+### Installer
 
 In a real-world scenario the user will desire to use the fuzzer against existing software that probably uses compiling systems such as Makefile, Just, Ninja, and so on. For this purpose it’s very convenient to have the static library `libastra_sancov.a` on the user’s system. 
 
@@ -253,7 +251,7 @@ The first step is to actually distribute Astra and its components properly to th
 
 It is now possible to instrument any target with the following command: `CC=clang CFLAGS=” -fsanitize-coverage=trace-pc-guard -fsanitize=address” LD=clang LDFLAGS=”-lastra_sancov -fsanitize=address`. 
 
-# Making a `cc` and `cxx` wrapper
+### Making a `cc` and `cxx` wrapper
 
 AFL and others offer a compiler wrapper so that users don't have to pass flags themself, this is exactly what astra do too. It ships with two compilers `astra_cc` and `astra_cxx` that can be used with building scripts such as `Makefile` and others. You can check these wrappers at this commit: `dc52a1c01d326074e27cf81df195d724ff42238a` in these files: `astra_cc/src/lib.rs` and `astra_cxx/src/lib.rs`. **Note**: We do not need a linker in the fuzzer anymore since linking now happens at compile time.
 
@@ -263,12 +261,12 @@ To test these wrappers I used `astra_cc` against the tool [htmldoc](https://gith
 
  We are now fuzzing an instrument binary with our own custom coverage!
 
-# Accepting trailing arguments and improving the CLI
+### Accepting trailing arguments and improving the CLI
 
 AFL doesn’t specify arguments itself, it receives it from the user and injects the filename at the position the user specified `@@`. For this reason we are going to implement a way to catch trailing arguments, read arguments after `--`, and inject the filename accordingly. It’s also a good time to improve the CLI more generally.  
 Clap offers a good way to catch trailing arguments, basically anything that is after `--` will be stored in a `Vec<String>`, we can then simply iterate over the vector, catch the `@@` symbol and inject the filename at the right place. A simple version can be found in the file `astra/src/main.rs` and `astra_cli/src/lib.rs` at this checkout: `dc52a1c01d326074e27cf81df195d724ff42238a`. 
 
-# Catching timeouts 
+### Catching timeouts
 
 Some bug classes do not result in an immediate crash but in a hang of the target program, for example a function could expect an argument to never be greater than a certain size, but not enforce any verification, which could result in infinite loop. It’s important to catch these errors too without flooding the user with false positives, for that reason the default value of a timeout is quite high and it’s up to the user to adjust it accordingly. 
 
@@ -278,7 +276,7 @@ Writing a timeout catcher can be complex because we have to deal with signal han
 
 You can find an example at `astra_worker/src/worker.rs` at this checkout: `9c05b4f5ef2e3adfba21d094ee347f92a7a5645f` **Note:** the timeout is defaulted to 10ms in the CLI in this example! Voila! Astra is now essentially a rudimentary but complete fuzzer! Hourra!
 
-# Conclusion
+## Conclusion
 
 
 Astra shows that building a modern fuzzer isn’t magic: it’s a set of simple mechanisms engineered carefully. By combining fast coverage feedback, a shared map, a basic corpus loop, and aggressive mutations, we already get something surprisingly effective and scalable. This project is intentionally educational, so there’s still a lot to improve: scheduling, minimization, and deeper heuristics, but the foundation is solid. 

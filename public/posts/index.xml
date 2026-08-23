@@ -2,55 +2,35 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Posts on 2ourc3</title>
-    <link>https://2ourc3.com/posts/</link>
+    <link>http://localhost:1313/posts/</link>
     <description>Recent content in Posts on 2ourc3</description>
     <generator>Hugo</generator>
     <language>en</language>
     <lastBuildDate>Thu, 15 Jan 2026 13:45:02 +0100</lastBuildDate>
-    <atom:link href="https://2ourc3.com/posts/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://localhost:1313/posts/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Writing a fuzzer from scratch: Astra</title>
-      <link>https://2ourc3.com/posts/astra/</link>
+      <link>http://localhost:1313/posts/astra/</link>
       <pubDate>Thu, 15 Jan 2026 13:45:02 +0100</pubDate>
-      <guid>https://2ourc3.com/posts/astra/</guid>
-      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;https://2ourc3.com/posts/astra/header.png&#34; style=&#34;display: block; margin: 0 auto;&#34;&gt;&lt;/p&gt;
+      <guid>http://localhost:1313/posts/astra/</guid>
+      <description>&lt;p&gt;&lt;img loading=&#34;lazy&#34; src=&#34;http://localhost:1313/posts/astra/header.png&#34; style=&#34;display: block; margin: 0 auto;&#34;&gt;&lt;/p&gt;
 &lt;p&gt;Fuzzing is one of the rare automated vulnerability techniques that proved its efficiency for  the past decades. This article aims to explain how to design and write a modern unix-compatible fuzzer, comparable to &lt;a href=&#34;https://github.com/AFLplusplus/AFLplusplus&#34;&gt;AFL++&lt;/a&gt;, &lt;a href=&#34;https://llvm.org/docs/LibFuzzer.html&#34;&gt;libFuzzer&lt;/a&gt; or &lt;a href=&#34;https://github.com/AFLplusplus/LibAFL&#34;&gt;LibAFL&lt;/a&gt;, from scratch. It’s assumed the reader knows Rust and has a basic understanding of what a fuzzer is.&lt;/p&gt;
 &lt;p&gt;Today I&amp;rsquo;m releasing &lt;a href=&#34;https://github.com/20urc3/Astra&#34;&gt;Astra&lt;/a&gt;, a Rust fuzzer made from scratch. This work wouldn’t have been possible without the excellent work of peers that published papers about novel approaches, developed, maintained and documented great open-source fuzzers. Open-source projects are often taken for granted, but in reality they exist because a small community is dedicating their time and efforts for everyone. Feel free to contribute in your way, resolve a &lt;code&gt;good first issue&lt;/code&gt; on &lt;a href=&#34;https://github.com/AFLplusplus/AFLplusplus&#34;&gt;AFL++&lt;/a&gt; or &lt;a href=&#34;https://github.com/AFLplusplus/LibAFL&#34;&gt;LibAFL&lt;/a&gt;, donate a coffee to the AFLplusplus organization, write documentation or simply use and share their work.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Vulnerability root-cause analysis on Linux</title>
-      <link>https://2ourc3.com/posts/rca/</link>
+      <link>http://localhost:1313/posts/rca/</link>
       <pubDate>Thu, 15 Jan 2026 00:00:00 +0000</pubDate>
-      <guid>https://2ourc3.com/posts/rca/</guid>
+      <guid>http://localhost:1313/posts/rca/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;As you may know: finding bugs is one of the greatest things in life — but once you finally obtain the precious memory corruption you were praying for, you still need to actually understand it.&lt;/p&gt;
 &lt;p&gt;In this article we’ll explore how to conduct a root-cause analysis of a vulnerability in a Linux open-source program that we compiled ourselves. That matters because it lets us &lt;strong&gt;disable stripping&lt;/strong&gt; and &lt;strong&gt;enable debug symbols&lt;/strong&gt;, which makes the investigation dramatically easier.&lt;/p&gt;</description>
     </item>
     <item>
-      <title>Harnessing Libraries for Effective Fuzzing</title>
-      <link>https://2ourc3.com/posts/harnessing/</link>
-      <pubDate>Thu, 15 Jan 2026 13:45:02 +0100</pubDate>
-      <guid>https://2ourc3.com/posts/harnessing/</guid>
-      <description>&lt;h1 id=&#34;harnessing-libraries-for-effective-fuzzing&#34;&gt;Harnessing Libraries for Effective Fuzzing&lt;/h1&gt;
-&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;Every security researcher or fuzzer enthusiast dreams of a program that takes a file as input, achieves deep coverage, and executes with lightning speed. Unfortunately, in the real world, only a handful of targets meet this ideal, making it unwise to &amp;ldquo;dumb fuzz&amp;rdquo; them (and you shouldn&amp;rsquo;t! See this guide).&lt;/p&gt;
-&lt;p&gt;Most targets are not fuzzable out of the box and require you, the researcher, to do some heavy lifting to enable efficient fuzzing. In this article, we will explore how to fuzz a library, from the basics to persistent mode. Our focus will be on Freetype, a widely used software library for accessing font file contents.&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>Golem - Engineering AI for Static Security Analysis</title>
-      <link>https://2ourc3.com/posts/golem/</link>
-      <pubDate>Thu, 15 Jan 2026 00:00:00 +0000</pubDate>
-      <guid>https://2ourc3.com/posts/golem/</guid>
-      <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
-&lt;p&gt;Have you ever tried to build furniture and somehow you got more (or less) parts than what you&amp;rsquo;d expect. You end up with a tiny stick of wood and 3 screws and your furniture seems to be done ? Reading the documentation is for the weak so you pull up your phone and ask ChatGPT: How many of those things I should have ?&lt;/p&gt;
-&lt;p&gt;&lt;img alt=&#34;image&#34; loading=&#34;lazy&#34; src=&#34;https://2ourc3.com/posts/golem/image1.png&#34; style=&#34;display: block; margin: 0 auto;&#34;&gt;&lt;/p&gt;
-&lt;p&gt;You check by yourself and what on Earth is ChatGPT yapping about ? There is now way there are that many parts left in the bag and 5 are already in the wardrobe. But wait, since a while now GPT (and others) accept document input. So, smart as you are, you download the instruction and immediately send it !&lt;/p&gt;</description>
-    </item>
-    <item>
       <title>WinAFL - Fuzzing Windows binaries</title>
-      <link>https://2ourc3.com/posts/win_fuzz/</link>
+      <link>http://localhost:1313/posts/win_fuzz/</link>
       <pubDate>Thu, 15 Jan 2026 13:45:02 +0100</pubDate>
-      <guid>https://2ourc3.com/posts/win_fuzz/</guid>
+      <guid>http://localhost:1313/posts/win_fuzz/</guid>
       <description>&lt;h2 id=&#34;introduction&#34;&gt;Introduction&lt;/h2&gt;
 &lt;p&gt;In this chapter we’ll dive into &lt;strong&gt;grey-box fuzzing&lt;/strong&gt; on &lt;strong&gt;closed-source Windows binaries&lt;/strong&gt; (PE executables) using &lt;strong&gt;WinAFL&lt;/strong&gt;.&lt;/p&gt;
 &lt;p&gt;The appeal is simple: Windows grey-box fuzzing has more friction (tooling, reversing, patching, debugging), so fewer people do it seriously — which means the targets are often less explored and the odds of finding interesting bugs can be higher.&lt;/p&gt;
