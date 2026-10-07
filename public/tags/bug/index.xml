@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Bug on 2ourc3</title>
+    <link>http://localhost:1313/tags/bug/</link>
+    <description>Recent content in Bug on 2ourc3</description>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Tue, 06 Oct 2026 10:09:00 +0100</lastBuildDate>
+    <atom:link href="http://localhost:1313/tags/bug/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>CVE-2026-TBD - Use-after-free write in GPAC HTTP input filter error path</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_httpin_notify_error_uaf/</link>
+      <pubDate>Tue, 06 Oct 2026 10:00:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_httpin_notify_error_uaf/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;in_http.c&lt;/code&gt; (HTTP input filter)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Use-after-free (write)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV; only HEAD is supported per GPAC policy)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3747&#34;&gt;issue #3747&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; Critical (9.2): &lt;code&gt;CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A heap use-after-free write exists in GPAC&amp;rsquo;s HTTP input filter, in &lt;code&gt;httpin_notify_error()&lt;/code&gt;. When the filter&amp;rsquo;s error-notification path runs during session setup, &lt;code&gt;gf_filter_setup_failure()&lt;/code&gt; can tear down the filter (freeing its context), but the function continues to write to that freed context afterward.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Use-after-free write in GPAC ISOBMFF reader (fragmented MP4)</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_isoffin_read_1301_uaf/</link>
+      <pubDate>Tue, 06 Oct 2026 10:01:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_isoffin_read_1301_uaf/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;isoffin_read.c&lt;/code&gt; (ISOBMFF / MP4 reader filter)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Use-after-free (write)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3748&#34;&gt;issue #3748&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; High (8.5): &lt;code&gt;CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A heap use-after-free write exists in GPAC&amp;rsquo;s ISOBMFF (MP4/MOV) reader, in &lt;code&gt;isoffin_push_buffer()&lt;/code&gt;. While demuxing a crafted fragmented MP4/MOV file, an error branch tears down the reader filter and then keeps writing to the now-freed reader context.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Use-after-free write in GPAC ISOBMFF reader (moof after mdat)</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_isoffin_read_1310_uaf/</link>
+      <pubDate>Tue, 06 Oct 2026 10:02:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_isoffin_read_1310_uaf/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;isoffin_read.c&lt;/code&gt; (ISOBMFF / MP4 reader filter)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Use-after-free (write)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3749&#34;&gt;issue #3749&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; High (8.5): &lt;code&gt;CVSS:4.0/AV:L/AC:L/AT:N/PR:N/UI:P/VC:L/VI:H/VA:H/SC:N/SI:N/SA:N&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A second heap use-after-free write exists in the same function as &lt;a href=&#34;http://localhost:1313/bugs/cve_tbd_gpac_isoffin_read_1301_uaf/&#34;&gt;the sibling bug at &lt;code&gt;isoffin_read.c:1301&lt;/code&gt;&lt;/a&gt;, this time in the &amp;ldquo;unsupported &lt;code&gt;moof&lt;/code&gt;-after-&lt;code&gt;mdat&lt;/code&gt;&amp;rdquo; error branch of GPAC&amp;rsquo;s ISOBMFF reader: a non-fragmented file where a &lt;code&gt;moof&lt;/code&gt; box unexpectedly appears after an &lt;code&gt;mdat&lt;/code&gt; box, with no file cache available.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Use-after-free write in GPAC AV1 reframer (OBU parse error)</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_av1_check_format_303_uaf/</link>
+      <pubDate>Tue, 06 Oct 2026 10:03:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_av1_check_format_303_uaf/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;reframe_av1.c&lt;/code&gt; (AV1 reframer / demuxer filter)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Use-after-free (write)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3744&#34;&gt;issue #3744&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; High (7.8 / CVSS 3.1, 8.5 / CVSS 4.0): &lt;code&gt;CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A heap use-after-free write exists in GPAC&amp;rsquo;s AV1 reframer, in &lt;code&gt;av1dmx_check_format()&lt;/code&gt;. When OBU (Open Bitstream Unit) parsing fails on a crafted AV1 stream, the filter is torn down via &lt;code&gt;gf_filter_setup_failure()&lt;/code&gt;, which can free the demuxer&amp;rsquo;s context, but the function then writes to that freed context on its way out.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Use-after-free write in GPAC AV1 reframer (missing temporal delimiter)</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_av1_check_format_310_uaf/</link>
+      <pubDate>Tue, 06 Oct 2026 10:04:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_av1_check_format_310_uaf/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;reframe_av1.c&lt;/code&gt; (AV1 reframer / demuxer filter)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Use-after-free (write)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3745&#34;&gt;issue #3745&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; High (7.8 / CVSS 3.1, 8.5 / CVSS 4.0): &lt;code&gt;CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A second heap use-after-free write exists in the same function as &lt;a href=&#34;http://localhost:1313/bugs/cve_tbd_gpac_av1_check_format_303_uaf/&#34;&gt;the sibling bug at &lt;code&gt;reframe_av1.c:303&lt;/code&gt;&lt;/a&gt;, this time reached when a stream has no timescale and never carries a temporal delimiter OBU.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Use-after-free in GPAC filter-session process task</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_filter_process_task_uaf/</link>
+      <pubDate>Tue, 06 Oct 2026 10:05:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_filter_process_task_uaf/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;filter.c&lt;/code&gt; (filter-session core / scheduler)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Use-after-free (write)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3746&#34;&gt;issue #3746&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; High (7.8 / CVSS 3.1, 8.5 / CVSS 4.0): &lt;code&gt;CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:H/I:H/A:H&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A heap use-after-free write exists in the core of GPAC&amp;rsquo;s filter-session scheduler, in &lt;code&gt;gf_filter_process_task()&lt;/code&gt;. If a filter&amp;rsquo;s own &lt;code&gt;process()&lt;/code&gt; callback causes the filter itself to be torn down (e.g. by calling &lt;code&gt;gf_filter_setup_failure()&lt;/code&gt; internally), the dispatcher that invoked the callback keeps writing to the now-freed &lt;code&gt;GF_Filter&lt;/code&gt; structure once the callback returns.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Use-after-free read in GPAC filter-session PID init task</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_filter_pid_init_task_uaf/</link>
+      <pubDate>Tue, 06 Oct 2026 10:06:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_filter_pid_init_task_uaf/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;filter_pid.c&lt;/code&gt; (filter-session core / PID resolution)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Use-after-free (8-byte pointer read)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3743&#34;&gt;issue #3743&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; Medium (5.5 / CVSS 3.1, 6.9 / CVSS 4.0): &lt;code&gt;CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A heap use-after-free read exists in GPAC&amp;rsquo;s filter-session core, in &lt;code&gt;gf_filter_pid_init_task()&lt;/code&gt;. While resolving the filter chain for a newly-created PID, the task function can end up dereferencing a PID (or its owning filter) that was freed as part of that same resolution process.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Heap buffer overflow in GPAC AC-3 bitstream reader</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_bitstream_ac3_oob/</link>
+      <pubDate>Tue, 06 Oct 2026 10:07:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_bitstream_ac3_oob/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;bitstream.c&lt;/code&gt; (core bitstream reader), reached via the AC-3 parser&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Heap buffer overflow (1-byte out-of-bounds read)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3740&#34;&gt;issue #3740&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; Medium (5.5 / CVSS 3.1, 5.1 / CVSS 4.0): &lt;code&gt;CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A heap-buffer-overflow (1-byte out-of-bounds read) exists in GPAC&amp;rsquo;s core bitstream reader, reachable from the AC-3 audio parser: a bitstream declared larger than its backing allocation reads one byte past the end of that allocation.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Heap buffer overflow in GPAC BT/XMT scene loader probe</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_ctxload_probe_oob/</link>
+      <pubDate>Tue, 06 Oct 2026 10:08:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_ctxload_probe_oob/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;load_bt_xmt.c&lt;/code&gt; (BT/XMT scene loader format probe)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Heap buffer overflow (1-byte out-of-bounds read)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3741&#34;&gt;issue #3741&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; Medium (5.5 / CVSS 3.1, 5.1 / CVSS 4.0): &lt;code&gt;CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A heap-buffer-overflow (1-byte out-of-bounds read) exists in GPAC&amp;rsquo;s BT/XMT scene-loader format probe: &lt;code&gt;strncmp&lt;/code&gt; reads past the end of the probe buffer when checking for a &lt;code&gt;&amp;lt;!DOCTYPE&lt;/code&gt; marker.&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>CVE-2026-TBD - Heap buffer overflow in GPAC H.264/H.265 NALU reframer probe</title>
+      <link>http://localhost:1313/bugs/cve_tbd_gpac_naludmx_probe_oob/</link>
+      <pubDate>Tue, 06 Oct 2026 10:09:00 +0100</pubDate>
+      <guid>http://localhost:1313/bugs/cve_tbd_gpac_naludmx_probe_oob/</guid>
+      <description>&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;CVE:&lt;/strong&gt; CVE-2026-TBD (CVE ID requested via MITRE, batch submission 2026-07-19)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Component:&lt;/strong&gt; &lt;code&gt;reframe_nalu.c&lt;/code&gt; (H.264/H.265 NALU reframer format probe)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vulnerability Type:&lt;/strong&gt; Heap buffer overflow (1-byte out-of-bounds read)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Vendor:&lt;/strong&gt; GPAC&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Product:&lt;/strong&gt; GPAC (libgpac / MP4Box / gpac)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Affected Versions:&lt;/strong&gt; master branch, commit &lt;code&gt;9bfcd13401cd1e52f966d03670c433d25952472c&lt;/code&gt; (26.03-DEV)&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Fix Status:&lt;/strong&gt; Fixed upstream: commit &lt;a href=&#34;https://github.com/gpac/gpac/commit/03e5b1c23a52c2524d0f06f9909d56de5825292e&#34;&gt;&lt;code&gt;03e5b1c&lt;/code&gt;&lt;/a&gt; (2026-07-22); &lt;a href=&#34;https://github.com/gpac/gpac/issues/3742&#34;&gt;issue #3742&lt;/a&gt; closed 2026-07-23&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Severity:&lt;/strong&gt; Medium (5.5 / CVSS 3.1, 5.1 / CVSS 4.0): &lt;code&gt;CVSS:3.1/AV:L/AC:L/PR:N/UI:R/S:U/C:N/I:N/A:H&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Credit:&lt;/strong&gt; Salim Largo (2ourc3)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;hr&gt;
+&lt;h2 id=&#34;description&#34;&gt;Description&lt;/h2&gt;
+&lt;p&gt;A heap-buffer-overflow (1-byte out-of-bounds read) exists in GPAC&amp;rsquo;s H.264/H.265 NALU reframer format probe: it reads &lt;code&gt;data[1]&lt;/code&gt; without first checking that a second byte actually remains in the probe buffer.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

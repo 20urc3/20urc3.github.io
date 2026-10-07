@@ -2,6 +2,36 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_httpin_notify_error_uaf/</loc>
+    <lastmod>2026-10-06T10:00:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_isoffin_read_1301_uaf/</loc>
+    <lastmod>2026-10-06T10:01:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_isoffin_read_1310_uaf/</loc>
+    <lastmod>2026-10-06T10:02:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_av1_check_format_303_uaf/</loc>
+    <lastmod>2026-10-06T10:03:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_av1_check_format_310_uaf/</loc>
+    <lastmod>2026-10-06T10:04:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_filter_process_task_uaf/</loc>
+    <lastmod>2026-10-06T10:05:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_filter_pid_init_task_uaf/</loc>
+    <lastmod>2026-10-06T10:06:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_bitstream_ac3_oob/</loc>
+    <lastmod>2026-10-06T10:07:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_ctxload_probe_oob/</loc>
+    <lastmod>2026-10-06T10:08:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/bugs/cve_tbd_gpac_naludmx_probe_oob/</loc>
+    <lastmod>2026-10-06T10:09:00+01:00</lastmod>
+  </url><url>
     <loc>http://localhost:1313/posts/astra/</loc>
     <lastmod>2026-01-15T13:45:02+01:00</lastmod>
   </url><url>
@@ -24,16 +54,20 @@
     <lastmod>2026-01-15T13:49:50+01:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/</loc>
-    <lastmod>2026-01-15T19:00:00+01:00</lastmod>
+    <lastmod>2026-10-06T10:09:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/bug/</loc>
+    <lastmod>2026-10-06T10:09:00+01:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/bugs/</loc>
-    <lastmod>2026-01-15T19:00:00+01:00</lastmod>
+    <lastmod>2026-10-06T10:09:00+01:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/tags/</loc>
+    <lastmod>2026-10-06T10:09:00+01:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/posts/</loc>
     <lastmod>2026-01-15T13:45:02+01:00</lastmod>
   </url><url>
     <loc>http://localhost:1313/categories/</loc>
-  </url><url>
-    <loc>http://localhost:1313/tags/</loc>
   </url>
 </urlset>

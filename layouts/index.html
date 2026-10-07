@@ -4,6 +4,14 @@
   <h1>{{ site.Params.mainpagetitle | default site.Title }}</h1>
 </header>
 
+<figure class="home-banner">
+  <picture>
+    <source srcset="{{ "img/magebase.webp" | relURL }}" type="image/webp">
+    <img src="{{ "img/magebase.png" | relURL }}" alt="2ourc3 and the weird machines" width="1600" height="1147" loading="eager" decoding="async">
+  </picture>
+  <figcaption class="home-banner-credit">2ourc3 and the weird machines - Artwork made with love by Lucas Fai&atilde;o</figcaption>
+</figure>
+
 <div class="home-index">
 
   {{/* ---------- Articles ---------- */}}
@@ -24,7 +32,7 @@
     {{- $meta := slice }}
     {{- with .venue }}{{ $meta = $meta | append . }}{{ end }}
     {{- with .year }}{{ $meta = $meta | append (string .) }}{{ end }}
-    <li><a href="{{ .url }}" rel="noopener" target="_blank" title="{{ .title }}">{{ .title }}</a>{{ with $meta }}<span class="home-meta"> &mdash; {{ delimit . " " }}</span>{{ end }}{{ with .slides }}<span class="home-meta"> - <a href="{{ . | relURL }}" download title="Download slides (PDF)">Download slides</a></span>{{ end }}</li>
+    <li><a href="{{ .url }}" rel="noopener" target="_blank" title="{{ .title }}">{{ .title }}</a>{{ with $meta }}<span class="home-meta"> - {{ delimit . " " }}</span>{{ end }}{{ with .slides }}<span class="home-meta"> - <a href="{{ . | relURL }}" download title="Download slides (PDF)">Download slides</a></span>{{ end }}</li>
     {{- end }}
   </ul>
   {{- end }}

@@ -9,6 +9,61 @@
     --border: rgb(38, 38, 38);
 }
 
+/* --- landing page: banner artwork with hover credit --- */
+.home-banner {
+    position: relative;
+    margin: 12px 0 10px;
+    line-height: 0;          /* kill the inline-image descender gap */
+}
+
+.home-banner img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 518px;        /* keep the artwork a banner, not a wall */
+    margin: 0 auto;
+}
+
+/* Credit sits over the foot of the image, invisible until the artwork is
+   hovered, then fades in highlighted. */
+.home-banner-credit {
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    max-width: 92%;
+    padding: 3px 9px;
+    font-size: 12px;
+    line-height: 1.4;
+    white-space: nowrap;
+    color: #000;
+    background: var(--tertiary, #ffd84d);
+    border-radius: var(--radius, 4px);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+}
+
+.home-banner:hover .home-banner-credit,
+.home-banner:focus-within .home-banner-credit {
+    opacity: 1;
+}
+
+/* Narrow screens: no room for the overlay strip, so let it wrap below. */
+@media screen and (max-width: 480px) {
+    .home-banner-credit {
+        position: static;
+        transform: none;
+        display: block;
+        max-width: none;
+        margin: 6px auto 0;
+        white-space: normal;
+        text-align: center;
+        opacity: 1;          /* always show it when it can't overlay */
+    }
+}
+
 /* --- landing page: two flat, one-line-per-entry lists --- */
 .home-header {
     margin-bottom: 0;
